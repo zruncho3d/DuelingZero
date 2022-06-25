@@ -4,8 +4,9 @@
 # To see arguments, invoke this script with:
 #   ./duel.py -h
 #
-# Sample invocation:
-# python duel.py dz.local:7125 dz.local:7126 --duel
+# Sample invocations:
+#   python duel.py dz.local:7125 dz.local:7126 --duel
+#   ./duel.py dz.local:7125 dz.local:7126 --input sample.gcode --home --home_after
 #
 
 import argparse
@@ -19,8 +20,8 @@ import re
 import sys
 import time
 
-import requests
 from gcodeparser import GcodeParser, GcodeLine
+import requests
 
 
 # Offset of T1 relative to T0, so that they align.
@@ -32,6 +33,7 @@ DEF_TOOLHEAD_X_OFFSET = 0.0
 # - basic: use a ~120 x ~120 chunk of the workspace where T0 parks at the back left and T1 parks at the front right.
 MODES = ['basic']
 DEF_MODE = 'basic'
+
 
 class Duel(cmd.Cmd, object):
 
@@ -60,8 +62,6 @@ class Duel(cmd.Cmd, object):
 READ_TIMEOUT=180
 
 
-
-
 def home(printer):
     run_gcode(printer, "G28 X Y")
 
@@ -82,33 +82,10 @@ def run_gcode(printer, gcode, verbose=False):
     return r
 
 
-def run_gcode_blocking(printer, gcode, verbose=False):
-    """Run a gcode command to completion and return the result, along with an M400.
-    https://github.com/Arksine/moonraker/blob/master/docs/web_api.md#run-a-gcode
-    """
-    r = requests.post("http://" + printer + "/printer/gcode/script?script=" + gcode, timeout=(1, READ_TIMEOUT))
-    if verbose:
-        print(r.status_code)
-    # Disable to workaround 60-second presumably-Moonraker timeout
-    assert(r.status_code == 200)
-    return r
-
-
 T0 = GcodeLine(('T', 0), {}, "")
 T1 = GcodeLine(('T', 1), {}, "")
 
 # # https://stackoverflow.com/questions/7685984/add-method-that-works-with-either-a-point-object-or-a-tuple
-# class Point(tuple):
-#     def __new__(cls, x, y):
-#         return tuple.__new__(cls, (x, y))
-#
-#     def __add__(self, other):
-#         return Point(self[0] + other[0], self[1] + other[1])
-#
-#     def __repr__(self):
-#         return 'Point({0}, {1})'.format(self[0], self[1])
-#
-
 class Point():
     def __init__(self, x, y):
         self.x = x
@@ -137,19 +114,25 @@ class DuelRunner():
 
     """Put away Toolhead T0"""
     def T0park(self):
-        for gcode in ["G0 X1", "G0 Y159"]:
+        for gcode in ["G0 X1", "G0 Y159", "M400"]:
             print("> ", gcode)
-            run_gcode(self.left, gcode)
-        print("> ", "M400")
-        run_gcode(self.left, "M400")
+            self.run_gcode(self.left, gcode)
 
     """Put away Toolhead T1"""
     def T1park(self):
-        for gcode in ["G0 X159", "G0 Y1"]:
+        for gcode in ["G0 X159", "G0 Y1", "M400"]:
             print("> ", gcode)
-            run_gcode(self.right, gcode)
-        print("> ", "M400")
-        run_gcode(self.right, "M400")
+            self.run_gcode(self.right, gcode)
+
+    def is_toolchange_gcode(self, line):
+        return line == T0 or line == T1
+
+    def is_move_gcode(self, line):
+        return line.command == ('G', 0) or line.command == ('G', 1)
+
+    def run_gcode(self, instance, gcode_line):
+        if not self.args.dry_run:
+            run_gcode(instance, gcode_line)
 
     def play_gcodes(self, input):
 
@@ -176,14 +159,17 @@ class DuelRunner():
         toolhead_pos = Point(0, 0)
         left_toolhead_pos = None
         right_toolhead_pos = None
+
+        left_pos = Point(1.0, 159.0)
+        right_pos = Point(165.0, 1.0)
+
         for line in lines:
-            if line == T0 or line == T1:
-                print("*   completing all in-progress moves before changing toolhead to %s (M400)" % active_instance)
-                if not self.args.dry_run:
-                    run_gcode(self.left, "M400")
-                    run_gcode(self.right, "M400")
-                print("> ", line.gcode_str)
-                print("*   parking other (%s) toolhead" % get_nonactive_instance(active_instance))
+            print("> ", line.gcode_str)
+
+            if self.is_toolchange_gcode(line):
+                print("  *   completing all in-progress moves before changing toolhead to %s (M400)" % active_instance)
+                self.run_gcode(get_active_printer_name(active_instance), "M400")
+                print("  *   parking other (%s) toolhead" % get_nonactive_instance(active_instance))
                 if line == T0:
                     if not self.args.dry_run:
                         self.T1park()
@@ -192,9 +178,8 @@ class DuelRunner():
                     if not self.args.dry_run:
                         self.T0park()
                     active_instance = 'right'
-            elif line.command == ('G', 0) or line.command == ('G', 1):
-                print("> ", line.gcode_str)
 
+            elif self.is_move_gcode(line):
                 # Process move target.
                 next_toolhead_pos = toolhead_pos
                 if line.get_param('X') is not None:
@@ -203,6 +188,8 @@ class DuelRunner():
                     next_toolhead_pos.y = line.get_param('Y')
 
                 # TODO: ensure safety of the move.
+
+
                 # Check against bounding box.
 
                 # Check against full move.
@@ -216,7 +203,7 @@ class DuelRunner():
                         mod_line.update_param('X', line.get_param('X') + self.toolhead_x_offset)
 
                 if not self.args.dry_run:
-                    run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
+                    self.run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
 
                 # Update position of toolhead after execution
                 if line.get_param('X') is not None:
@@ -224,8 +211,14 @@ class DuelRunner():
                 if line.get_param('Y') is not None:
                     toolhead_pos.y = line.get_param('Y')
 
+        for instance in [self.left, self.right]:
+            self.run_gcode(instance, "M400")
 
     def run(self):
+        if args.input and not os.path.exists(args.input):
+            print("Invalid input file path: %s" % args.input)
+            sys.exit(1)
+
         print("Running:")
         left = args.left
         right = args.right
