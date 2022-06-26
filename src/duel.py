@@ -15,12 +15,14 @@ import copy
 import os
 import random
 import sys
+import time
 
 from gcodeparser import GcodeParser, GcodeLine
 import requests
 
 from toolhead import LEFT_HOME_POS, RIGHT_HOME_POS, check_for_overlap, check_for_overlap_sweep
-from toolhead import Y_HEIGHT, X_WIDTH, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW
+from toolhead import Y_HEIGHT, X_WIDTH, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW, FLIP_SPEED, TOOLHEAD_Y_HEIGHT
+from toolhead import X_BACKAWAY_LEN, BACKAWAY_SPEED, PARK_SPEED
 from point import Point
 
 
@@ -95,26 +97,40 @@ class DuelRunner:
         self.toolhead_x_offset = float(args.toolhead_x_offset)
         self.mode = args.mode
         self.m400_always = args.m400_always
+        self.simple_flips = 0
+        self.backup_flips = 0
+        self.segmented_flips = 0
         self.args = args
+
+    def test_latency(self):
+        times = []
+        for i in range(3):
+            start_time = time.time()
+            for gcode in ["M400"]:
+                run_gcode(self.left, gcode)
+            elapsed = time.time() - start_time
+            times.append(elapsed)
+        print("Times: %s" % times)
+        sys.exit(1)
 
     """Put away Toolhead T0"""
     def t0_park(self):
-        for gcode in ["G0 X1", "G0 Y159", "M400"]:
+        for gcode in ["G0 X1 F%s" % PARK_SPEED, "G0 Y159 F%s" % PARK_SPEED, "M400"]:
             self.run_gcode(self.left, gcode)
 
     """Put away Toolhead T1"""
     def t1_park(self):
-        for gcode in ["G0 X159", "G0 Y1", "M400"]:
+        for gcode in ["G0 X159 F%s" % PARK_SPEED, "G0 Y1 F%s" % PARK_SPEED, "M400"]:
             self.run_gcode(self.right, gcode)
 
     """Back away T0"""
     def t0_backaway(self):
-        for gcode in ["G0 X%s" % TO_X_BACKAWAY, "M400"]:
+        for gcode in ["G0 X%s F%s" % (TO_X_BACKAWAY, BACKAWAY_SPEED), "M400"]:
             self.run_gcode(self.left, gcode)
 
     """Back away T1"""
     def t1_backaway(self):
-        for gcode in ["G0 X%s" % T1_X_BACKAWAY, "M400"]:
+        for gcode in ["G0 X%s F%s" % (T1_X_BACKAWAY, BACKAWAY_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
 
     def t0_flip(self, pos):
@@ -124,7 +140,7 @@ class DuelRunner:
             new_y = Y_HIGH
         elif pos.y == Y_HIGH:
             new_y = Y_LOW
-        for gcode in ["G0 Y%s" % new_y, "M400"]:
+        for gcode in ["G0 Y%s F%s" % (new_y, FLIP_SPEED), "M400"]:
             self.run_gcode(self.left, gcode)
         return Point(pos.x, new_y)
 
@@ -135,7 +151,7 @@ class DuelRunner:
             new_y = Y_HIGH
         elif pos.y == Y_HIGH:
             new_y = Y_LOW
-        for gcode in ["G0 Y%s" % new_y, "M400"]:
+        for gcode in ["G0 Y%s F%s" % (new_y, FLIP_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
         return Point(pos.x, new_y)
 
@@ -162,19 +178,104 @@ class DuelRunner:
         if not self.args.dry_run:
             run_gcode(instance, gcode_line)
 
+    def get_corresponding_x(self, toolhead_pos, next_toolhead_pos, target_y):
+
+        # Handle vertical case.
+        if toolhead_pos.x == next_toolhead_pos.x:
+            return toolhead_pos.x
+
+        # Compute the new path portion that gets us clear of the future parked inactive extruder in the Y.
+        # Slope (m); intercept (b); y = mx + b
+        m = (next_toolhead_pos.y - toolhead_pos.y) / (next_toolhead_pos.x - toolhead_pos.x)
+        b = (toolhead_pos.y - m) / toolhead_pos.x
+        # Find point on line where Y-val = min to clear.
+        # x = (<Y val> - b) / m
+        x = (target_y - b) / m
+        # Execute first part.
+        return x
+
+    def do_right_segmented_sequence(self, toolhead_pos, target_y, next_toolhead_pos, inactive_toolhead_pos):
+        # If a simple backup-X move, followed by resume-X, were to cause a collision,
+        # then execute enough of the move to clear the flipped inactive extruder, back it away,
+        # do the flip, then resume with the second part of the move.
+
+        # TODO: handle extrusion in the move split and retain the g-code used for the move (G0 vs G1, etc.)
+        x = self.get_corresponding_x(toolhead_pos, next_toolhead_pos, target_y)
+        mid_pos = Point(x, target_y)
+        print("  ! Segmented sequence")
+        print("  ! Doing first part of move sequence")
+        self.t0_go_to(mid_pos)
+        print("  ! Backing up t0")
+        self.t0_backaway()
+        print("  ! Flipping inactive 1")
+        right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+        print(" ! Restoring t0 to mid_pos after backup: %s" % mid_pos)
+        self.t0_go_to(mid_pos)
+        print(" ! Doing second part of move sequence : %s" % mid_pos)
+        self.t0_go_to(next_toolhead_pos)
+        return right_toolhead_pos
+
+    def do_right_backup_sequence(self, toolhead_pos, inactive_toolhead_pos, active_instance, line):
+        print("  ! Backup sequence")
+        print("  ! Backup flip: t0 Backing up")
+        self.t0_backaway()
+        print("  ! Flipping inactive t1")
+        right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+        # Restore original x for active instance
+        print(" ! Resuming after backup: t0 restoring to %s" % toolhead_pos)
+        self.t0_go_to(toolhead_pos)
+        print(" ! Running original move.")
+        self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
+        return right_toolhead_pos
+
+    def do_left_segmented_sequence(self, toolhead_pos, target_y, next_toolhead_pos, inactive_toolhead_pos):
+        # If a simple backup-X move, followed by resume-X, were to cause a collision,
+        # then execute enough of the move to clear the flipped inactive extruder, back it away,
+        # do the flip, then resume with the second part of the move.
+
+        # TODO: handle extrusion in the move split and retain the g-code used for the move (G0 vs G1, etc.)
+        x = self.get_corresponding_x(toolhead_pos, next_toolhead_pos, target_y)
+        mid_pos = Point(x, target_y)
+        print("  ! Segmented sequence")
+        print("  ! Doing first part of move sequence")
+        self.t1_go_to(mid_pos)
+        print("  ! Backing up t0")
+        self.t1_backaway()
+        print("  ! Flipping inactive 1")
+        left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+        print("  ! Restoring t0 to mid_pos after backup: %s" % mid_pos)
+        self.t1_go_to(mid_pos)
+        print("  ! Doing second part of move sequence : %s" % mid_pos)
+        self.t1_go_to(next_toolhead_pos)
+        return left_toolhead_pos
+
+    def do_left_backup_sequence(self, toolhead_pos, inactive_toolhead_pos, active_instance, line):
+        print("  ! Backup sequence")
+        print("  ! Backup flip: t0 Backing up")
+        self.t1_backaway()
+        print("  ! Flipping inactive t1")
+        left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+        # Restore original x for active instance
+        print("  ! Resuming after backup: t0 restoring to %s" % toolhead_pos)
+        self.t1_go_to(toolhead_pos)
+        print("  ! Running original move.")
+        self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
+        return left_toolhead_pos
+
+    def get_active_printer_name(self, active_instance):
+        if active_instance == 'left':
+            return self.left
+        else:
+            return self.right
+
+    def get_nonactive_printer_name(self, active_instance):
+        if active_instance == 'left':
+            return 'right'
+        else:
+            return 'left'
+
+
     def play_gcodes(self, input_file):
-
-        def get_active_printer_name(active_instance):
-            if active_instance == 'left':
-                return self.left
-            else:
-                return self.right
-
-        def get_nonactive_instance(active_instance):
-            if active_instance == 'left':
-                return 'right'
-            else:
-                return 'left'
 
         with open(input_file, 'r') as f:
             gcode = f.read()
@@ -187,7 +288,7 @@ class DuelRunner:
 
         for line in lines:
             print(line.gcode_str)
-            # TODO: ignore Tx when x is already active
+            # TODO: ignore Tx when x is already active; save a few M400s and maybe moves that way.
 
             if self.is_toolchange_gcode(line):
                 next_instance = None
@@ -195,10 +296,10 @@ class DuelRunner:
                     next_instance = 'left'
                 elif line == T1:
                     next_instance = 'right'
-                print("  *   completing all in-progress moves for currently active extruder %s, before changing toolhead to %s (M400)" %
+                print("  *   draining moves for %s, then changing to %s (M400)" %
                       (active_instance, next_instance))
-                self.run_gcode(get_active_printer_name(active_instance), "M400")
-                print("  *   parking other (%s) toolhead" % active_instance)
+                self.run_gcode(self.get_active_printer_name(active_instance), "M400")
+                print("  *   parking currently active toolhead (%s) " % active_instance)
                 if line == T0:
                     self.t1_park()
                     right_toolhead_pos = RIGHT_HOME_POS
@@ -238,68 +339,82 @@ class DuelRunner:
 
                 if self.mode == 'simple':
                     if overlap_rect:
-                        print("!!! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
+                        print("  ! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
                         sys.exit(1)
                     if overlap_swept:
-                        print("!!! Swept bounding boxes overlap: %s --> %s vs %s.  Exiting." %
+                        print("  ! Swept bounding boxes overlap: %s --> %s vs %s.  Exiting." %
                               (toolhead_pos, next_toolhead_pos, next_toolhead_pos))
                         sys.exit(1)
 
                 elif self.mode == 'smart':
                     # Check if a single move will suffice.
                     if overlap_rect or overlap_swept:
-                        self.run_gcode(get_active_printer_name(active_instance), "M400")
+                        self.run_gcode(self.get_active_printer_name(active_instance), "M400")
 
-                        if False:
-                            if overlap_rect:
-                                print("  ! Saw overlap_rect; continuing.")
-                            if overlap_swept:
-                                print("  ! Saw overlap_swept; continuing.")
+                        # Check first if a segmented move is necessary.
+                        # Cover front case first.
+                        min_y_to_clear_inactive_toolhead = TOOLHEAD_Y_HEIGHT
+                        max_y_to_clear_inactive_toolhead = Y_HEIGHT - min_y_to_clear_inactive_toolhead
 
-                        # Move active back!
                         if active_instance == 'left':
                             # Target must be on the right.
 
-                            # Move if we're currently in the right-side end zone.
-                            if toolhead_pos.x >= TO_X_BACKAWAY:
-                                print("  ! t0 Backing away")
-                                self.t0_backaway()
+                            # Simple flip if we're not in the end zone yet.
+                            if toolhead_pos.x < TO_X_BACKAWAY:
+                                self.simple_flips += 1
+                                print("  ! Simple flip")
+                                print("  ! Flipping inactive t1")
+                                right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+                                self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
-                            # Flip inactive t1.
-                            print("  ! flipping inactive t1")
-                            right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+                            # Segmented move: active is now in the front, and would conflict with a back-to-front flipped inactive toolhead
+                            elif toolhead_pos.y <= min_y_to_clear_inactive_toolhead:
+                                self.segmented_flips += 1
+                                right_toolhead_pos = self.do_right_segmented_sequence(toolhead_pos, min_y_to_clear_inactive_toolhead,
+                                                                                      next_toolhead_pos, inactive_toolhead_pos)
 
-                            # Restore original x for active instance
-                            if toolhead_pos.x >= TO_X_BACKAWAY:
-                                print("!!! t0 Going to %s" % toolhead_pos)
-                                self.t0_go_to(toolhead_pos)
+                            # Segmented move: active is in the rear
+                            elif toolhead_pos.y >= max_y_to_clear_inactive_toolhead:
+                                self.segmented_flips += 1
+                                right_toolhead_pos = self.do_right_segmented_sequence(toolhead_pos, max_y_to_clear_inactive_toolhead,
+                                                                                      next_toolhead_pos, inactive_toolhead_pos)
+
+                            # Backup move.
+                            else:
+                                self.backup_flips += 1
+                                right_toolhead_pos = self.do_right_backup_sequence(toolhead_pos, inactive_toolhead_pos, active_instance, line)
 
                         elif active_instance == 'right':
                             # Target must be on the left.
 
-                            # Move if we're currently in the left-side end zone.
-                            if toolhead_pos.x <= T1_X_BACKAWAY:
-                                print("  ! t1 Backing away")
-                                self.t1_backaway()
+                            # Simple flip.
+                            if toolhead_pos.x > X_BACKAWAY_LEN:
+                                self.simple_flips += 1
+                                print("  ! Simple flip")
+                                print("  ! Flipping inactive t0")
+                                left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+                                self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
-                            # Flip inactive t0.
-                            print("  ! flipping inactive t0")
-                            left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+                            # Segmented move: active is in the front
+                            elif toolhead_pos.y <= min_y_to_clear_inactive_toolhead:
+                                self.segmented_flips += 1
+                                left_toolhead_pos = self.do_left_segmented_sequence(toolhead_pos, min_y_to_clear_inactive_toolhead,
+                                                                                      next_toolhead_pos, inactive_toolhead_pos)
 
-                            # Restore original x for active instance
-                            if toolhead_pos.x <= T1_X_BACKAWAY:
-                                print("  ! t1 Going to %s" % toolhead_pos)
-                                self.t1_go_to(toolhead_pos)
+                            # Segmented move: active is in the rear
+                            elif toolhead_pos.y >= max_y_to_clear_inactive_toolhead:
+                                self.segmented_flips += 1
+                                left_toolhead_pos = self.do_left_segmented_sequence(toolhead_pos, max_y_to_clear_inactive_toolhead,
+                                                                                      next_toolhead_pos, inactive_toolhead_pos)
 
-                    # TODO: check if a multi-move sequence is needed.
+                            # Backup move.
+                            else:
+                                self.backup_flips += 1
+                                right_toolhead_pos = self.do_left_backup_sequence(toolhead_pos, inactive_toolhead_pos, active_instance, line)
 
-                # Apply offsets if this is the right toolhead.
-                mod_line = line
-                if active_instance == 'right':
-                    if line.get_param('X'):
-                        mod_line.update_param('X', line.get_param('X') + self.toolhead_x_offset)
-
-                self.run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
+                    # If no overlap, just do the straight line.
+                    else:
+                        self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
                 if self.m400_always:
                     for instance in [self.left, self.right]:
@@ -318,6 +433,9 @@ class DuelRunner:
         if args.input and not os.path.exists(args.input):
             print("Invalid input file path: %s" % args.input)
             sys.exit(1)
+
+        if args.latency_test:
+            dr.test_latency()
 
         print("Running:")
         left = args.left
@@ -359,6 +477,7 @@ if __name__ == "__main__":
     parser.add_argument('--input', help="Input gcode filepath")
     parser.add_argument('--toolhead_x_offset', help="Toolhead X offset", default=DEF_TOOLHEAD_X_OFFSET)
     parser.add_argument('--mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MODE)
+    parser.add_argument('--latency-test', help="Measure latency of command exec", action='store_true')
     parser.add_argument('--verbose', help="Use more-verbose debug output", action='store_true')
 
     args = parser.parse_args()

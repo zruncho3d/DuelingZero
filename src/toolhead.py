@@ -1,5 +1,7 @@
-
-import sys
+#!/usr/bin/env python3
+# To run tests:
+#   pip3 install nose
+#   python3 -m nose toolhead.py
 
 from shapely.geometry import Polygon
 
@@ -23,10 +25,13 @@ EXTRA_TOOLHEAD_CLEARANCE = 0.25
 TOOLHEAD_X_WIDTH = 40.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
 TOOLHEAD_Y_HEIGHT = 53.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
 
-X_BACKAWAY_LEN = 50
+X_BACKAWAY_LEN = TOOLHEAD_X_WIDTH + 5
 TO_X_BACKAWAY = 165.0 - X_BACKAWAY_LEN
 T1_X_BACKAWAY = X_BACKAWAY_LEN
 
+FLIP_SPEED = 15000
+BACKAWAY_SPEED = 15000
+PARK_SPEED = 15000
 
 def get_shapely_rectangle(p1, p2):
     return Polygon([(p1.x, p1.y), (p2.x, p1.y), (p2.x, p2.y), (p1.x, p2.y)])
@@ -81,10 +86,29 @@ def form_toolhead_sweep(p_a, p_b):
                         (p2.x - TOOLHEAD_X_WIDTH / 2, p2.y + TOOLHEAD_Y_HEIGHT / 2)])
 
 
-if __name__ == "__main__":
-    assert form_toolhead_sweep(Point(0.0, 0.0), Point(10.0, 10.0)).intersects(
-        get_toolhead_bounds(Point(0, TOOLHEAD_X_WIDTH / 2 + 1.0)))
-    assert form_toolhead_sweep(Point(0.0, 10.0), Point(10.0, 0.0)).intersects(
-        get_toolhead_bounds(Point(TOOLHEAD_X_WIDTH / 2 + 2.0, TOOLHEAD_Y_HEIGHT / 2 + 2.0)))
-    assert form_toolhead_sweep(Point(0.0, 0.0), Point(100.0, 100.0)).intersects(
-        get_toolhead_bounds(Point(100.0 + (TOOLHEAD_X_WIDTH / 2 )- 1, 100.0 + (TOOLHEAD_Y_HEIGHT / 2) - 1)))
+test_data = [
+    (Point(0.0, 0.0),
+     Point(10.0, 10.0),
+     Point(0, TOOLHEAD_X_WIDTH / 2 + 1.0),
+     True),
+    (Point(0.0, 10.0),
+     Point(10.0, 0.0),
+     Point(TOOLHEAD_X_WIDTH / 2 + 2.0, TOOLHEAD_Y_HEIGHT / 2 + 2.0),
+     True),
+    (Point(0.0, 0.0),
+     Point(100.0, 100.0),
+     Point(100.0 + (TOOLHEAD_X_WIDTH / 2 )- 1, 100.0 + (TOOLHEAD_Y_HEIGHT / 2) - 1),
+     True)
+]
+
+
+def check_toolhead_sweep(start, end, inactive, desired_outcome):
+    outcome = form_toolhead_sweep(start, end).intersects(get_toolhead_bounds(inactive))
+    assert outcome == desired_outcome, "start: %s, end: %s, inactive: %s, desired: %s, actual, %s" % \
+                                       (start, end, inactive, desired_outcome, outcome)
+
+
+def test_toolhead_sweeps():
+    for test_input in test_data:
+        start, end, inactive, desired_outcome = test_input
+        yield check_toolhead_sweep, start, end, inactive, desired_outcome
