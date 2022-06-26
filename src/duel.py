@@ -11,17 +11,15 @@
 
 import argparse
 import cmd
-import json
+import copy
 import os
-import pprint
-import statistics
 import random
-import re
 import sys
-import time
 
 from gcodeparser import GcodeParser, GcodeLine
 import requests
+
+from toolhead import LEFT_HOME_POS, RIGHT_HOME_POS, check_for_overlap, check_for_overlap_sweep
 
 
 # Offset of T1 relative to T0, so that they align.
@@ -42,7 +40,8 @@ class Duel(cmd.Cmd, object):
         self.right = right
         super(Duel, self).__init__()
 
-    def random_y(self):
+    @staticmethod
+    def random_y():
         return random.randint(30, 90)
 
     def do_l(self, arg):
@@ -59,7 +58,7 @@ class Duel(cmd.Cmd, object):
 # Set this high enough to handle any command you'd run.
 # Note, however, that Moonraker by default throws a 200 after exactly
 # one minute, even with this value set to exceed one minute.
-READ_TIMEOUT=180
+READ_TIMEOUT = 180
 
 
 def home(printer):
@@ -85,34 +84,8 @@ def run_gcode(printer, gcode, verbose=False):
 T0 = GcodeLine(('T', 0), {}, "")
 T1 = GcodeLine(('T', 1), {}, "")
 
-# # https://stackoverflow.com/questions/7685984/add-method-that-works-with-either-a-point-object-or-a-tuple
-class Point():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
 
-    def __add__(self, other):
-        if isinstance(other, Point):
-            return Point(self.x + other.x, self.y + other.y)
-        elif isinstance(other, tuple):
-            return Point(self.x + other[0], self.y + other[1])
-        else:
-            raise TypeError("unsupported operand type(s) for +: 'Point' and '{0}'".format(type(other)))
-
-    def __repr__(self):
-        return 'Point ({0}, {1})'.format(self.x, self.y) # Remove the u if you're using Python 3
-
-
-LEFT_HOME_POS = Point(1.0, 159.0)
-RIGHT_HOME_POS = Point(165.0, 1.0)
-
-# Change these value to match your toolhead.  Values are for a MiniAB/MiniAS.
-EXTRA_TOOLHEAD_CLEARANCE = 2.0
-TOOLHEAD_X_WIDTH = 40.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
-TOOLHEAD_Y_HEIGHT = 53.0 + + EXTRA_TOOLHEAD_CLEARANCE * 2
-
-
-class DuelRunner():
+class DuelRunner:
 
     def __init__(self, args):
         self.left = args.left
@@ -121,18 +94,19 @@ class DuelRunner():
         self.args = args
 
     """Put away Toolhead T0"""
-    def T0park(self):
+    def t0_park(self):
         for gcode in ["G0 X1", "G0 Y159", "M400"]:
             print("> ", gcode)
             self.run_gcode(self.left, gcode)
 
     """Put away Toolhead T1"""
-    def T1park(self):
+    def t1_park(self):
         for gcode in ["G0 X159", "G0 Y1", "M400"]:
             print("> ", gcode)
             self.run_gcode(self.right, gcode)
 
-    def is_toolchange_gcode(self, line):
+    @staticmethod
+    def is_toolchange_gcode(line):
         return line == T0 or line == T1
 
     def is_move_gcode(self, line):
@@ -142,14 +116,7 @@ class DuelRunner():
         if not self.args.dry_run:
             run_gcode(instance, gcode_line)
 
-    def check_for_overlap(self, p1, p2):
-        overlap = ((p1.x >= p2.x - TOOLHEAD_X_WIDTH) and (p1.x <= p2.x + TOOLHEAD_X_WIDTH) and
-            (p1.y >= p2.y - TOOLHEAD_Y_HEIGHT) and (p1.y <= p2.y + TOOLHEAD_Y_HEIGHT))
-        if overlap:
-            print("!!! Bounding boxes overlap: %s %s.  Exiting." % (p1, p2))
-            sys.exit(1)
-
-    def play_gcodes(self, input):
+    def play_gcodes(self, input_file):
 
         def get_active_printer_name(active_instance):
             if active_instance == 'left':
@@ -163,57 +130,68 @@ class DuelRunner():
             else:
                 return 'left'
 
-
-        with open(input, 'r') as f:
+        with open(input_file, 'r') as f:
             gcode = f.read()
 
         lines = GcodeParser(gcode).lines
-        #pprint.pprint(lines)
 
         active_instance = 'left'
-        left_toolhead_pos = LEFT_HOME_POS
-        right_toolhead_pos = RIGHT_HOME_POS
-        # Assume implicit T0 for first move.
-        toolhead_pos = left_toolhead_pos
+        left_toolhead_pos = LEFT_HOME_POS.copy()
+        right_toolhead_pos = RIGHT_HOME_POS.copy()
 
         for line in lines:
             print("> ", line.gcode_str)
 
             if self.is_toolchange_gcode(line):
-                print("  *   completing all in-progress moves before changing toolhead to %s (M400)" % active_instance)
+                print("  *   completing all in-progress moves for %s before changing toolhead to %s (M400)" %
+                      (active_instance, get_nonactive_instance(active_instance)))
                 self.run_gcode(get_active_printer_name(active_instance), "M400")
-                print("  *   parking other (%s) toolhead" % get_nonactive_instance(active_instance))
+                print("  *   parking other (%s) toolhead" % active_instance)
                 if line == T0:
-                    if not self.args.dry_run:
-                        self.T1park()
-                    left_toolhead_pos = LEFT_HOME_POS
+                    self.t1_park()
+                    right_toolhead_pos = RIGHT_HOME_POS
                     active_instance = 'left'
                 elif line == T1:
-                    if not self.args.dry_run:
-                        self.T0park()
+                    self.t0_park()
+                    left_toolhead_pos = LEFT_HOME_POS
                     active_instance = 'right'
-                    right_toolhead_pos = RIGHT_HOME_POS
 
             elif self.is_move_gcode(line):
 
                 # Form target of move.
+                if active_instance == 'left':
+                    toolhead_pos = left_toolhead_pos
+                elif active_instance == 'right':
+                    toolhead_pos = right_toolhead_pos
+
                 next_toolhead_pos = toolhead_pos
                 if line.get_param('X') is not None:
                     next_toolhead_pos.x = float(line.get_param('X'))
                 if line.get_param('Y') is not None:
                     next_toolhead_pos.y = float(line.get_param('Y'))
 
+                inactive_toolhead_pos = None
                 if active_instance == 'left':
                     inactive_toolhead_pos = right_toolhead_pos
                 elif active_instance == 'right':
                     inactive_toolhead_pos = left_toolhead_pos
 
                 # Ensure move is safe.
-                self.check_for_overlap(inactive_toolhead_pos, next_toolhead_pos)
 
-                # Check against bounding box.
+                # (1) Check against destination bounding box.
+                overlap_rect = check_for_overlap(inactive_toolhead_pos, next_toolhead_pos)
 
-                # Check against full move.
+                if overlap_rect:
+                    print("!!! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
+                    sys.exit(1)
+
+                # (2) Check swept area against inactive bounding box
+                overlap_swept = check_for_overlap_sweep(toolhead_pos, next_toolhead_pos, inactive_toolhead_pos)
+
+                if overlap_swept:
+                    print("!!! Swept bounding boxes overlap: %s --> %s vs %s.  Exiting." %
+                          (toolhead_pos, next_toolhead_pos, next_toolhead_pos))
+                    sys.exit(1)
 
                 # Apply offsets if this is the right toolhead.
                 mod_line = line
@@ -229,8 +207,6 @@ class DuelRunner():
                     left_toolhead_pos = next_toolhead_pos
                 elif active_instance == 'right':
                     right_toolhead_pos = next_toolhead_pos
-
-
 
         for instance in [self.left, self.right]:
             self.run_gcode(instance, "M400")
