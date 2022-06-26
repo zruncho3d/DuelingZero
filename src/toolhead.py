@@ -5,13 +5,27 @@ from shapely.geometry import Polygon
 
 from point import Point
 
-LEFT_HOME_POS = Point(1.0, 159.0)
-RIGHT_HOME_POS = Point(165.0, 1.0)
+Y_HEIGHT = 160.0
+Y_HIGH = 159.0
+Y_LOW = 1.0
+X_WIDTH = 165.0
+X_HIGH = 164.0
+X_LOW = 1.0
+
+LEFT_ALT_Y = Y_LOW
+RIGHT_ALT_Y = Y_HIGH
+
+LEFT_HOME_POS = Point(X_LOW, Y_HIGH)
+RIGHT_HOME_POS = Point(X_HIGH, Y_LOW)
 
 # Change these value to match your toolhead.  Values are for a MiniAB/MiniAS.
 EXTRA_TOOLHEAD_CLEARANCE = 0.25
 TOOLHEAD_X_WIDTH = 40.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
 TOOLHEAD_Y_HEIGHT = 53.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
+
+X_BACKAWAY_LEN = 50
+TO_X_BACKAWAY = 165.0 - X_BACKAWAY_LEN
+T1_X_BACKAWAY = X_BACKAWAY_LEN
 
 
 def get_shapely_rectangle(p1, p2):

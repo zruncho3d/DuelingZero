@@ -20,6 +20,8 @@ from gcodeparser import GcodeParser, GcodeLine
 import requests
 
 from toolhead import LEFT_HOME_POS, RIGHT_HOME_POS, check_for_overlap, check_for_overlap_sweep
+from toolhead import Y_HEIGHT, X_WIDTH, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW
+from point import Point
 
 
 # Offset of T1 relative to T0, so that they align.
@@ -29,8 +31,8 @@ DEF_TOOLHEAD_X_OFFSET = 0.0
 
 # Default mode to use.
 # - basic: use a ~120 x ~120 chunk of the workspace where T0 parks at the back left and T1 parks at the front right.
-MODES = ['basic']
-DEF_MODE = 'basic'
+MODES = ['simple', 'smart']
+DEF_MODE = 'simple'
 
 
 class Duel(cmd.Cmd, object):
@@ -91,18 +93,58 @@ class DuelRunner:
         self.left = args.left
         self.right = args.right
         self.toolhead_x_offset = float(args.toolhead_x_offset)
+        self.mode = args.mode
+        self.m400_always = args.m400_always
         self.args = args
 
     """Put away Toolhead T0"""
     def t0_park(self):
         for gcode in ["G0 X1", "G0 Y159", "M400"]:
-            print("> ", gcode)
             self.run_gcode(self.left, gcode)
 
     """Put away Toolhead T1"""
     def t1_park(self):
         for gcode in ["G0 X159", "G0 Y1", "M400"]:
-            print("> ", gcode)
+            self.run_gcode(self.right, gcode)
+
+    """Back away T0"""
+    def t0_backaway(self):
+        for gcode in ["G0 X%s" % TO_X_BACKAWAY, "M400"]:
+            self.run_gcode(self.left, gcode)
+
+    """Back away T1"""
+    def t1_backaway(self):
+        for gcode in ["G0 X%s" % T1_X_BACKAWAY, "M400"]:
+            self.run_gcode(self.right, gcode)
+
+    def t0_flip(self, pos):
+        assert pos.y == Y_HIGH or pos.y == Y_LOW
+        new_y = None
+        if pos.y == Y_LOW:
+            new_y = Y_HIGH
+        elif pos.y == Y_HIGH:
+            new_y = Y_LOW
+        for gcode in ["G0 Y%s" % new_y, "M400"]:
+            self.run_gcode(self.left, gcode)
+        return Point(pos.x, new_y)
+
+    def t1_flip(self, pos):
+        assert pos.y == Y_HIGH or pos.y == Y_LOW
+        new_y = None
+        if pos.y == Y_LOW:
+            new_y = Y_HIGH
+        elif pos.y == Y_HIGH:
+            new_y = Y_LOW
+        for gcode in ["G0 Y%s" % new_y, "M400"]:
+            self.run_gcode(self.right, gcode)
+        return Point(pos.x, new_y)
+
+    def t0_go_to(self, pos):
+        for gcode in ["G0 X%s Y%s" % (pos.x, pos.y), "M400"]:
+            self.run_gcode(self.left, gcode)
+
+    def t1_go_to(self, pos):
+        for gcode in ["G0 X%s Y%s" % (pos.x, pos.y), "M400"]:
             self.run_gcode(self.right, gcode)
 
     @staticmethod
@@ -113,6 +155,10 @@ class DuelRunner:
         return line.command == ('G', 0) or line.command == ('G', 1)
 
     def run_gcode(self, instance, gcode_line):
+        if instance == self.left:
+            print("  left>  ", gcode_line)
+        elif instance == self.right:
+            print("  right> ", gcode_line)
         if not self.args.dry_run:
             run_gcode(instance, gcode_line)
 
@@ -140,11 +186,17 @@ class DuelRunner:
         right_toolhead_pos = RIGHT_HOME_POS.copy()
 
         for line in lines:
-            print("> ", line.gcode_str)
+            print(line.gcode_str)
+            # TODO: ignore Tx when x is already active
 
             if self.is_toolchange_gcode(line):
-                print("  *   completing all in-progress moves for %s before changing toolhead to %s (M400)" %
-                      (active_instance, get_nonactive_instance(active_instance)))
+                next_instance = None
+                if line == T0:
+                    next_instance = 'left'
+                elif line == T1:
+                    next_instance = 'right'
+                print("  *   completing all in-progress moves for currently active extruder %s, before changing toolhead to %s (M400)" %
+                      (active_instance, next_instance))
                 self.run_gcode(get_active_printer_name(active_instance), "M400")
                 print("  *   parking other (%s) toolhead" % active_instance)
                 if line == T0:
@@ -164,7 +216,7 @@ class DuelRunner:
                 elif active_instance == 'right':
                     toolhead_pos = right_toolhead_pos
 
-                next_toolhead_pos = toolhead_pos
+                next_toolhead_pos = toolhead_pos.copy()
                 if line.get_param('X') is not None:
                     next_toolhead_pos.x = float(line.get_param('X'))
                 if line.get_param('Y') is not None:
@@ -181,17 +233,65 @@ class DuelRunner:
                 # (1) Check against destination bounding box.
                 overlap_rect = check_for_overlap(inactive_toolhead_pos, next_toolhead_pos)
 
-                if overlap_rect:
-                    print("!!! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
-                    sys.exit(1)
-
                 # (2) Check swept area against inactive bounding box
                 overlap_swept = check_for_overlap_sweep(toolhead_pos, next_toolhead_pos, inactive_toolhead_pos)
 
-                if overlap_swept:
-                    print("!!! Swept bounding boxes overlap: %s --> %s vs %s.  Exiting." %
-                          (toolhead_pos, next_toolhead_pos, next_toolhead_pos))
-                    sys.exit(1)
+                if self.mode == 'simple':
+                    if overlap_rect:
+                        print("!!! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
+                        sys.exit(1)
+                    if overlap_swept:
+                        print("!!! Swept bounding boxes overlap: %s --> %s vs %s.  Exiting." %
+                              (toolhead_pos, next_toolhead_pos, next_toolhead_pos))
+                        sys.exit(1)
+
+                elif self.mode == 'smart':
+                    # Check if a single move will suffice.
+                    if overlap_rect or overlap_swept:
+                        self.run_gcode(get_active_printer_name(active_instance), "M400")
+
+                        if False:
+                            if overlap_rect:
+                                print("  ! Saw overlap_rect; continuing.")
+                            if overlap_swept:
+                                print("  ! Saw overlap_swept; continuing.")
+
+                        # Move active back!
+                        if active_instance == 'left':
+                            # Target must be on the right.
+
+                            # Move if we're currently in the right-side end zone.
+                            if toolhead_pos.x >= TO_X_BACKAWAY:
+                                print("  ! t0 Backing away")
+                                self.t0_backaway()
+
+                            # Flip inactive t1.
+                            print("  ! flipping inactive t1")
+                            right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+
+                            # Restore original x for active instance
+                            if toolhead_pos.x >= TO_X_BACKAWAY:
+                                print("!!! t0 Going to %s" % toolhead_pos)
+                                self.t0_go_to(toolhead_pos)
+
+                        elif active_instance == 'right':
+                            # Target must be on the left.
+
+                            # Move if we're currently in the left-side end zone.
+                            if toolhead_pos.x <= T1_X_BACKAWAY:
+                                print("  ! t1 Backing away")
+                                self.t1_backaway()
+
+                            # Flip inactive t0.
+                            print("  ! flipping inactive t0")
+                            left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+
+                            # Restore original x for active instance
+                            if toolhead_pos.x <= T1_X_BACKAWAY:
+                                print("  ! t1 Going to %s" % toolhead_pos)
+                                self.t1_go_to(toolhead_pos)
+
+                    # TODO: check if a multi-move sequence is needed.
 
                 # Apply offsets if this is the right toolhead.
                 mod_line = line
@@ -199,8 +299,11 @@ class DuelRunner:
                     if line.get_param('X'):
                         mod_line.update_param('X', line.get_param('X') + self.toolhead_x_offset)
 
-                if not self.args.dry_run:
-                    self.run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
+                self.run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
+
+                if self.m400_always:
+                    for instance in [self.left, self.right]:
+                        self.run_gcode(self.left, "M400")
 
                 # Update position of toolhead after execution
                 if active_instance == 'left':
@@ -220,7 +323,7 @@ class DuelRunner:
         left = args.left
         right = args.right
 
-        if args.home and not args.dry_run:
+        if (args.home or args.input) and not args.dry_run:
             home(left)
             home(right)
 
@@ -250,11 +353,12 @@ if __name__ == "__main__":
     parser.add_argument('--duel', help="Begin duel!", action='store_true')
     parser.add_argument('--meet', help="Meet in center", action='store_true')
     parser.add_argument('--home', help="Home first", action='store_true')
-    parser.add_argument('--home_after', help="Home after print", action='store_true')
+    parser.add_argument('--home-after', help="Home after print", action='store_true')
     parser.add_argument('--dry-run', help="Dry run", action='store_true')
+    parser.add_argument('--m400-always', help="Always run M400 after input moves", action='store_true')
     parser.add_argument('--input', help="Input gcode filepath")
     parser.add_argument('--toolhead_x_offset', help="Toolhead X offset", default=DEF_TOOLHEAD_X_OFFSET)
-    parser.add_argument('--mode', help="Toolhead X offset", default=DEF_MODE)
+    parser.add_argument('--mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MODE)
     parser.add_argument('--verbose', help="Use more-verbose debug output", action='store_true')
 
     args = parser.parse_args()
