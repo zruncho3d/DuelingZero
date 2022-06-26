@@ -103,6 +103,14 @@ class Point():
         return 'Point ({0}, {1})'.format(self.x, self.y) # Remove the u if you're using Python 3
 
 
+LEFT_HOME_POS = Point(1.0, 159.0)
+RIGHT_HOME_POS = Point(165.0, 1.0)
+
+# Change these value to match your toolhead.  Values are for a MiniAB/MiniAS.
+EXTRA_TOOLHEAD_CLEARANCE = 2.0
+TOOLHEAD_X_WIDTH = 40.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
+TOOLHEAD_Y_HEIGHT = 53.0 + + EXTRA_TOOLHEAD_CLEARANCE * 2
+
 
 class DuelRunner():
 
@@ -134,6 +142,13 @@ class DuelRunner():
         if not self.args.dry_run:
             run_gcode(instance, gcode_line)
 
+    def check_for_overlap(self, p1, p2):
+        overlap = ((p1.x >= p2.x - TOOLHEAD_X_WIDTH) and (p1.x <= p2.x + TOOLHEAD_X_WIDTH) and
+            (p1.y >= p2.y - TOOLHEAD_Y_HEIGHT) and (p1.y <= p2.y + TOOLHEAD_Y_HEIGHT))
+        if overlap:
+            print("!!! Bounding boxes overlap: %s %s.  Exiting." % (p1, p2))
+            sys.exit(1)
+
     def play_gcodes(self, input):
 
         def get_active_printer_name(active_instance):
@@ -156,12 +171,10 @@ class DuelRunner():
         #pprint.pprint(lines)
 
         active_instance = 'left'
-        toolhead_pos = Point(0, 0)
-        left_toolhead_pos = None
-        right_toolhead_pos = None
-
-        left_pos = Point(1.0, 159.0)
-        right_pos = Point(165.0, 1.0)
+        left_toolhead_pos = LEFT_HOME_POS
+        right_toolhead_pos = RIGHT_HOME_POS
+        # Assume implicit T0 for first move.
+        toolhead_pos = left_toolhead_pos
 
         for line in lines:
             print("> ", line.gcode_str)
@@ -173,28 +186,34 @@ class DuelRunner():
                 if line == T0:
                     if not self.args.dry_run:
                         self.T1park()
+                    left_toolhead_pos = LEFT_HOME_POS
                     active_instance = 'left'
                 elif line == T1:
                     if not self.args.dry_run:
                         self.T0park()
                     active_instance = 'right'
+                    right_toolhead_pos = RIGHT_HOME_POS
 
             elif self.is_move_gcode(line):
-                # Process move target.
+
+                # Form target of move.
                 next_toolhead_pos = toolhead_pos
                 if line.get_param('X') is not None:
-                    next_toolhead_pos.x = line.get_param('X')
+                    next_toolhead_pos.x = float(line.get_param('X'))
                 if line.get_param('Y') is not None:
-                    next_toolhead_pos.y = line.get_param('Y')
+                    next_toolhead_pos.y = float(line.get_param('Y'))
 
-                # TODO: ensure safety of the move.
+                if active_instance == 'left':
+                    inactive_toolhead_pos = right_toolhead_pos
+                elif active_instance == 'right':
+                    inactive_toolhead_pos = left_toolhead_pos
 
+                # Ensure move is safe.
+                self.check_for_overlap(inactive_toolhead_pos, next_toolhead_pos)
 
                 # Check against bounding box.
 
                 # Check against full move.
-
-                # TODO: batch many gcodes into one command to maximize lookahead
 
                 # Apply offsets if this is the right toolhead.
                 mod_line = line
@@ -206,10 +225,12 @@ class DuelRunner():
                     self.run_gcode(get_active_printer_name(active_instance), mod_line.gcode_str)
 
                 # Update position of toolhead after execution
-                if line.get_param('X') is not None:
-                    toolhead_pos.x = line.get_param('X')
-                if line.get_param('Y') is not None:
-                    toolhead_pos.y = line.get_param('Y')
+                if active_instance == 'left':
+                    left_toolhead_pos = next_toolhead_pos
+                elif active_instance == 'right':
+                    right_toolhead_pos = next_toolhead_pos
+
+
 
         for instance in [self.left, self.right]:
             self.run_gcode(instance, "M400")
