@@ -16,4 +16,4 @@ class Point():
         return Point(self.x, self.y)
 
     def __repr__(self):
-        return 'Point ({0}, {1})'.format(self.x, self.y) # Remove the u if you're using Python 3
+        return 'Point ({0}, {1})'.format(self.x, self.y)

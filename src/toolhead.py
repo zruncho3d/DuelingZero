@@ -7,6 +7,7 @@ from shapely.geometry import Polygon
 
 from point import Point
 
+# Change these values to match your printer.
 Y_HEIGHT = 160.0
 Y_HIGH = 159.0
 Y_LOW = 1.0
@@ -20,7 +21,11 @@ RIGHT_ALT_Y = Y_HIGH
 LEFT_HOME_POS = Point(X_LOW, Y_HIGH)
 RIGHT_HOME_POS = Point(X_HIGH, Y_LOW)
 
-# Change these value to match your toolhead.  Values are for a MiniAB/MiniAS.
+FLIP_SPEED = 15000
+BACKAWAY_SPEED = 15000
+PARK_SPEED = 15000
+
+# Change these values to match your toolhead.  Values are for a MiniAB/MiniAS.
 EXTRA_TOOLHEAD_CLEARANCE = 0.25
 TOOLHEAD_X_WIDTH = 40.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
 TOOLHEAD_Y_HEIGHT = 53.0 + EXTRA_TOOLHEAD_CLEARANCE * 2
@@ -29,9 +34,6 @@ X_BACKAWAY_LEN = TOOLHEAD_X_WIDTH + 5
 TO_X_BACKAWAY = 165.0 - X_BACKAWAY_LEN
 T1_X_BACKAWAY = X_BACKAWAY_LEN
 
-FLIP_SPEED = 15000
-BACKAWAY_SPEED = 15000
-PARK_SPEED = 15000
 
 def get_shapely_rectangle(p1, p2):
     return Polygon([(p1.x, p1.y), (p2.x, p1.y), (p2.x, p2.y), (p1.x, p2.y)])
@@ -48,19 +50,15 @@ def check_for_overlap(p1, p2):
     poly1 = get_toolhead_bounds(p1)
     poly2 = get_toolhead_bounds(p2)
     overlap = poly1.intersects(poly2)
-
-    # Commented out; using the more general approach above
-    _overlap = ((p1.x >= p2.x - TOOLHEAD_X_WIDTH) and (p1.x <= p2.x + TOOLHEAD_X_WIDTH) and
-                (p1.y >= p2.y - TOOLHEAD_Y_HEIGHT) and (p1.y <= p2.y + TOOLHEAD_Y_HEIGHT))
-
     return overlap
+
 
 def check_for_overlap_sweep(toolhead_pos, next_toolhead_pos, inactive_toolhead_pos):
     return form_toolhead_sweep(toolhead_pos, next_toolhead_pos).intersects(
         get_toolhead_bounds(inactive_toolhead_pos))
 
 
-# Not quite rect bounds, but most of it.
+# Not quite rect bounds, but most of it.  Rect bounds can cover the rest of the true swept area.
 def form_toolhead_sweep(p_a, p_b):
     """Return Polygon with quad covering the area swept by the translated rectangle,
     but not the "far away" corners of it."""
