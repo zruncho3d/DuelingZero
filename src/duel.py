@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Script to test out a Dueling Zero printer with two toolheads.
+# Script to run a Dueling Zero printer with two toolheads.
 #
 # To see arguments, invoke this script with:
 #   ./duel.py -h
@@ -10,10 +10,7 @@
 #
 
 import argparse
-import cmd
-import copy
 import os
-import random
 import sys
 import time
 
@@ -21,45 +18,20 @@ from gcodeparser import GcodeParser, GcodeLine
 import requests
 
 from toolhead import LEFT_HOME_POS, RIGHT_HOME_POS, check_for_overlap, check_for_overlap_sweep
-from toolhead import Y_HEIGHT, X_WIDTH, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW, FLIP_SPEED, TOOLHEAD_Y_HEIGHT
-from toolhead import X_BACKAWAY_LEN, BACKAWAY_SPEED, PARK_SPEED
+from toolhead import Y_HEIGHT, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW
+from toolhead import X_BACKAWAY_LEN, BACKAWAY_SPEED, PARK_SPEED, FLIP_SPEED, TOOLHEAD_Y_HEIGHT
 from point import Point
+from battle import Battle
 
 
-# Offset of T1 relative to T0, so that they align.
-# Should roughly match the depth of the toolhead in X and width of the toolhead too.
-DEF_TOOLHEAD_X_OFFSET = 0.0
-
-
-# Default mode to use.
-# - basic: use a ~120 x ~120 chunk of the workspace where T0 parks at the back left and T1 parks at the front right.
+# Modes:
+# - simple: if a conflicting move were to occur, exit the program.
+# - smart: intelligently handle conflicting moves, by inserting backups, splits, and flips.
 MODES = ['simple', 'smart']
 DEF_MODE = 'simple'
 
 
-class Duel(cmd.Cmd, object):
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-        super(Duel, self).__init__()
-
-    @staticmethod
-    def random_y():
-        return random.randint(30, 90)
-
-    def do_l(self, arg):
-        print("Doing left")
-        run_gcode(self.left, "G0 X15 F1200")
-        run_gcode(self.left, "G0 X60 Y%s F6000" % self.random_y())
-
-    def do_r(self, arg):
-        print("Doing right")
-        run_gcode(self.right, "G0 X100 F1200")
-        run_gcode(self.right, "G0 X60 Y%s F6000" % self.random_y())
-
-
-# Set this high enough to handle any command you'd run.
+# Set this high enough to handle any command(s) you'd run.
 # Note, however, that Moonraker by default throws a 200 after exactly
 # one minute, even with this value set to exceed one minute.
 READ_TIMEOUT = 180
@@ -111,24 +83,19 @@ class DuelRunner:
             elapsed = time.time() - start_time
             times.append(elapsed)
         print("Times: %s" % times)
-        sys.exit(1)
 
-    """Put away Toolhead T0"""
     def t0_park(self):
-        for gcode in ["G0 X1 F%s" % PARK_SPEED, "G0 Y159 F%s" % PARK_SPEED, "M400"]:
+        for gcode in ["G0 X%s F%s" % (X_LOW, PARK_SPEED), "G0 Y%s F%s" % (Y_HIGH, PARK_SPEED), "M400"]:
             self.run_gcode(self.left, gcode)
 
-    """Put away Toolhead T1"""
     def t1_park(self):
-        for gcode in ["G0 X159 F%s" % PARK_SPEED, "G0 Y1 F%s" % PARK_SPEED, "M400"]:
+        for gcode in ["G0 X%s F%s" % (X_HIGH, PARK_SPEED), "G0 Y%s F%s" % (Y_LOW, PARK_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
 
-    """Back away T0"""
     def t0_backaway(self):
         for gcode in ["G0 X%s F%s" % (TO_X_BACKAWAY, BACKAWAY_SPEED), "M400"]:
             self.run_gcode(self.left, gcode)
 
-    """Back away T1"""
     def t1_backaway(self):
         for gcode in ["G0 X%s F%s" % (T1_X_BACKAWAY, BACKAWAY_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
@@ -167,7 +134,8 @@ class DuelRunner:
     def is_toolchange_gcode(line):
         return line == T0 or line == T1
 
-    def is_move_gcode(self, line):
+    @staticmethod
+    def is_move_gcode(line):
         return line.command == ('G', 0) or line.command == ('G', 1)
 
     def run_gcode(self, instance, gcode_line):
@@ -178,20 +146,21 @@ class DuelRunner:
         if not self.args.dry_run:
             run_gcode(instance, gcode_line)
 
-    def get_corresponding_x(self, toolhead_pos, next_toolhead_pos, target_y):
+    @staticmethod
+    def get_corresponding_x(toolhead_pos, next_toolhead_pos, target_y):
+        """Get the corresponding x for a target y; useful for splitting moves for segmented avoidance."""
 
         # Handle vertical case.
         if toolhead_pos.x == next_toolhead_pos.x:
             return toolhead_pos.x
 
         # Compute the new path portion that gets us clear of the future parked inactive extruder in the Y.
-        # Slope (m); intercept (b); y = mx + b
+        # y = mx + b; slope (m); intercept (b);
         m = (next_toolhead_pos.y - toolhead_pos.y) / (next_toolhead_pos.x - toolhead_pos.x)
         b = (toolhead_pos.y - m) / toolhead_pos.x
         # Find point on line where Y-val = min to clear.
         # x = (<Y val> - b) / m
         x = (target_y - b) / m
-        # Execute first part.
         return x
 
     def do_right_segmented_sequence(self, toolhead_pos, target_y, next_toolhead_pos, inactive_toolhead_pos):
@@ -268,18 +237,18 @@ class DuelRunner:
         else:
             return self.right
 
-    def get_nonactive_printer_name(self, active_instance):
+    @staticmethod
+    def get_nonactive_printer_name(active_instance):
         if active_instance == 'left':
             return 'right'
         else:
             return 'left'
 
-
     def play_gcodes(self, input_file):
+        """Execute all G-codes from a file, inserting backups/flips/splits as needed."""
 
         with open(input_file, 'r') as f:
             gcode = f.read()
-
         lines = GcodeParser(gcode).lines
 
         active_instance = 'left'
@@ -330,10 +299,8 @@ class DuelRunner:
                     inactive_toolhead_pos = left_toolhead_pos
 
                 # Ensure move is safe.
-
                 # (1) Check against destination bounding box.
                 overlap_rect = check_for_overlap(inactive_toolhead_pos, next_toolhead_pos)
-
                 # (2) Check swept area against inactive bounding box
                 overlap_swept = check_for_overlap_sweep(toolhead_pos, next_toolhead_pos, inactive_toolhead_pos)
 
@@ -351,8 +318,6 @@ class DuelRunner:
                     if overlap_rect or overlap_swept:
                         self.run_gcode(self.get_active_printer_name(active_instance), "M400")
 
-                        # Check first if a segmented move is necessary.
-                        # Cover front case first.
                         min_y_to_clear_inactive_toolhead = TOOLHEAD_Y_HEIGHT
                         max_y_to_clear_inactive_toolhead = Y_HEIGHT - min_y_to_clear_inactive_toolhead
 
@@ -387,7 +352,7 @@ class DuelRunner:
                         elif active_instance == 'right':
                             # Target must be on the left.
 
-                            # Simple flip.
+                            # Simple flip if we're not in the end zone yet.
                             if toolhead_pos.x > X_BACKAWAY_LEN:
                                 self.simple_flips += 1
                                 print("  ! Simple flip")
@@ -416,6 +381,7 @@ class DuelRunner:
                     else:
                         self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
+                # Should not be necessary... workaround to test, despite M400 insertion bugs.
                 if self.m400_always:
                     for instance in [self.left, self.right]:
                         self.run_gcode(self.left, "M400")
@@ -453,8 +419,8 @@ class DuelRunner:
                 center(left)
                 center(right)
 
-            if args.duel:
-                dz = Duel(left, right)
+            if args.battle:
+                dz = Battle(run_gcode, left, right)
                 dz.cmdloop()
 
         if args.home_after and not args.dry_run:
@@ -465,17 +431,16 @@ class DuelRunner:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run a multi-Klipper-instance test.")
-    parser.add_argument('left', help="T0 (left) printer address - something like mainsailos.local")
-    parser.add_argument('right', help="T1 (right) printer address - something like mainsailos.local")
-    parser.add_argument('--duel', help="Begin duel!", action='store_true')
+    parser = argparse.ArgumentParser(description="Run a Dual Gantry printer.")
+    parser.add_argument('left', help="T0 (left) printer address - something like dz.local")
+    parser.add_argument('right', help="T1 (right) printer address - something like dz.local")
+    parser.add_argument('--battle', help="Begin battle!", action='store_true')
     parser.add_argument('--meet', help="Meet in center", action='store_true')
     parser.add_argument('--home', help="Home first", action='store_true')
     parser.add_argument('--home-after', help="Home after print", action='store_true')
     parser.add_argument('--dry-run', help="Dry run", action='store_true')
     parser.add_argument('--m400-always', help="Always run M400 after input moves", action='store_true')
     parser.add_argument('--input', help="Input gcode filepath")
-    parser.add_argument('--toolhead_x_offset', help="Toolhead X offset", default=DEF_TOOLHEAD_X_OFFSET)
     parser.add_argument('--mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MODE)
     parser.add_argument('--latency-test', help="Measure latency of command exec", action='store_true')
     parser.add_argument('--verbose', help="Use more-verbose debug output", action='store_true')
