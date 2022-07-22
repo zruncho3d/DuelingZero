@@ -64,14 +64,29 @@ T1 = GcodeLine(('T', 1), {}, "")
 class DuelRunner:
 
     def __init__(self, args):
-        self.left = args.left  # URL of left-side Moonraker instance
-        self.right = args.right  # URL of left-side Moonraker instance
-        self.mode = args.mode  # mode in MODES
-        self.m400_always = args.m400_always
+        self.left = None
+        self.right = None
+        self.mode = 'smart'
+        self.m400_always = False
+        self.args = None
+        self.dry_run = False
+        if args is not None:
+            self.left = args.left  # URL of left-side Moonraker instance
+            self.right = args.right  # URL of left-side Moonraker instance
+            self.mode = args.mode  # mode in MODES
+            self.m400_always = args.m400_always
+            self.args = args
+            self.dry_run = args.dry_run
+        # Use empty Args for regression testing, until this can be properly refactored.
+        # Motion should be separate from execution.
+        else:
+            self.left = 'left'
+            self.right = 'right'
+            self.dry_run = True
+        # Initialize metrics
         self.simple_shuffles = 0
         self.backup_shuffles = 0
         self.segmented_shuffles = 0
-        self.args = args
 
     def test_latency(self):
         times = []
@@ -142,7 +157,7 @@ class DuelRunner:
             print("  left>  ", gcode_line)
         elif instance == self.right:
             print("  right> ", gcode_line)
-        if not self.args.dry_run:
+        if not self.dry_run:
             run_gcode(instance, gcode_line)
 
     @staticmethod
@@ -243,12 +258,15 @@ class DuelRunner:
         else:
             return 'left'
 
-    def play_gcodes(self, input_file):
-        """Execute all G-codes from a file, inserting backups/shuffles/splits as needed."""
+    def play_gcodes_file(self, gcode_file):
+        file_content = None
+        with open(gcode_file, 'r') as f:
+            file_content = f.read()
+        self.play_gcodes(file_content)
 
-        with open(input_file, 'r') as f:
-            gcode = f.read()
-        lines = GcodeParser(gcode).lines
+    def play_gcodes(self, input_file_content):
+        """Execute all G-codes from file content, inserting backups/shuffles/splits as needed."""
+        lines = GcodeParser(input_file_content).lines
 
         active_instance = 'left'
         left_toolhead_pos = LEFT_HOME_POS.copy()
@@ -411,7 +429,7 @@ class DuelRunner:
             home(right)
 
         if args.input:
-            self.play_gcodes(args.input)
+            self.play_gcodes_file(args.input)
 
         else:
             if args.meet and not args.dry_run:
