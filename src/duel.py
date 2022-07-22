@@ -66,7 +66,6 @@ class DuelRunner:
     def __init__(self, args):
         self.left = args.left
         self.right = args.right
-        self.toolhead_x_offset = float(args.toolhead_x_offset)
         self.mode = args.mode
         self.m400_always = args.m400_always
         self.simple_flips = 0
