@@ -19,14 +19,14 @@ import requests
 
 from toolhead import LEFT_HOME_POS, RIGHT_HOME_POS, check_for_overlap, check_for_overlap_sweep
 from toolhead import Y_HEIGHT, TO_X_BACKAWAY, T1_X_BACKAWAY, Y_HIGH, Y_LOW, X_HIGH, X_LOW
-from toolhead import X_BACKAWAY_LEN, BACKAWAY_SPEED, PARK_SPEED, FLIP_SPEED, TOOLHEAD_Y_HEIGHT
+from toolhead import X_BACKAWAY_LEN, BACKAWAY_SPEED, PARK_SPEED, SHUFFLE_SPEED, TOOLHEAD_Y_HEIGHT
 from point import Point
 from battle import Battle
 
 
 # Modes:
 # - simple: if a conflicting move were to occur, exit the program.
-# - smart: intelligently handle conflicting moves, by inserting backups, splits, and flips.
+# - smart: intelligently handle conflicting moves, by inserting backups, splits, and shuffles.
 MODES = ['simple', 'smart']
 DEF_MODE = 'simple'
 
@@ -64,13 +64,13 @@ T1 = GcodeLine(('T', 1), {}, "")
 class DuelRunner:
 
     def __init__(self, args):
-        self.left = args.left
-        self.right = args.right
-        self.mode = args.mode
+        self.left = args.left  # URL of left-side Moonraker instance
+        self.right = args.right  # URL of left-side Moonraker instance
+        self.mode = args.mode  # mode in MODES
         self.m400_always = args.m400_always
-        self.simple_flips = 0
-        self.backup_flips = 0
-        self.segmented_flips = 0
+        self.simple_shuffles = 0
+        self.backup_shuffles = 0
+        self.segmented_shuffles = 0
         self.args = args
 
     def test_latency(self):
@@ -99,25 +99,25 @@ class DuelRunner:
         for gcode in ["G0 X%s F%s" % (T1_X_BACKAWAY, BACKAWAY_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
 
-    def t0_flip(self, pos):
+    def t0_shuffle(self, pos):
         assert pos.y == Y_HIGH or pos.y == Y_LOW
         new_y = None
         if pos.y == Y_LOW:
             new_y = Y_HIGH
         elif pos.y == Y_HIGH:
             new_y = Y_LOW
-        for gcode in ["G0 Y%s F%s" % (new_y, FLIP_SPEED), "M400"]:
+        for gcode in ["G0 Y%s F%s" % (new_y, SHUFFLE_SPEED), "M400"]:
             self.run_gcode(self.left, gcode)
         return Point(pos.x, new_y)
 
-    def t1_flip(self, pos):
+    def t1_shuffle(self, pos):
         assert pos.y == Y_HIGH or pos.y == Y_LOW
         new_y = None
         if pos.y == Y_LOW:
             new_y = Y_HIGH
         elif pos.y == Y_HIGH:
             new_y = Y_LOW
-        for gcode in ["G0 Y%s F%s" % (new_y, FLIP_SPEED), "M400"]:
+        for gcode in ["G0 Y%s F%s" % (new_y, SHUFFLE_SPEED), "M400"]:
             self.run_gcode(self.right, gcode)
         return Point(pos.x, new_y)
 
@@ -164,8 +164,8 @@ class DuelRunner:
 
     def do_right_segmented_sequence(self, toolhead_pos, target_y, next_toolhead_pos, inactive_toolhead_pos):
         # If a simple backup-X move, followed by resume-X, were to cause a collision,
-        # then execute enough of the move to clear the flipped inactive extruder, back it away,
-        # do the flip, then resume with the second part of the move.
+        # then execute enough of the move to clear the shuffled inactive extruder, back it away,
+        # do the shuffle, then resume with the second part of the move.
 
         # TODO: handle extrusion in the move split and retain the g-code used for the move (G0 vs G1, etc.)
         x = self.get_corresponding_x(toolhead_pos, next_toolhead_pos, target_y)
@@ -175,8 +175,8 @@ class DuelRunner:
         self.t0_go_to(mid_pos)
         print("  ! Backing up t0")
         self.t0_backaway()
-        print("  ! Flipping inactive 1")
-        right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+        print("  ! Shuffling inactive 1")
+        right_toolhead_pos = self.t1_shuffle(inactive_toolhead_pos)
         print(" ! Restoring t0 to mid_pos after backup: %s" % mid_pos)
         self.t0_go_to(mid_pos)
         print(" ! Doing second part of move sequence : %s" % mid_pos)
@@ -185,10 +185,10 @@ class DuelRunner:
 
     def do_right_backup_sequence(self, toolhead_pos, inactive_toolhead_pos, active_instance, line):
         print("  ! Backup sequence")
-        print("  ! Backup flip: t0 Backing up")
+        print("  ! Backup sequence: t0 Backing up")
         self.t0_backaway()
-        print("  ! Flipping inactive t1")
-        right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+        print("  ! Shuffling inactive t1")
+        right_toolhead_pos = self.t1_shuffle(inactive_toolhead_pos)
         # Restore original x for active instance
         print(" ! Resuming after backup: t0 restoring to %s" % toolhead_pos)
         self.t0_go_to(toolhead_pos)
@@ -198,8 +198,8 @@ class DuelRunner:
 
     def do_left_segmented_sequence(self, toolhead_pos, target_y, next_toolhead_pos, inactive_toolhead_pos):
         # If a simple backup-X move, followed by resume-X, were to cause a collision,
-        # then execute enough of the move to clear the flipped inactive extruder, back it away,
-        # do the flip, then resume with the second part of the move.
+        # then execute enough of the move to clear the shuffled inactive extruder, back it away,
+        # do the shuffle, then resume with the second part of the move.
 
         # TODO: handle extrusion in the move split and retain the g-code used for the move (G0 vs G1, etc.)
         x = self.get_corresponding_x(toolhead_pos, next_toolhead_pos, target_y)
@@ -209,8 +209,8 @@ class DuelRunner:
         self.t1_go_to(mid_pos)
         print("  ! Backing up t0")
         self.t1_backaway()
-        print("  ! Flipping inactive 1")
-        left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+        print("  ! Shuffling inactive 1")
+        left_toolhead_pos = self.t0_shuffle(inactive_toolhead_pos)
         print("  ! Restoring t0 to mid_pos after backup: %s" % mid_pos)
         self.t1_go_to(mid_pos)
         print("  ! Doing second part of move sequence : %s" % mid_pos)
@@ -219,10 +219,10 @@ class DuelRunner:
 
     def do_left_backup_sequence(self, toolhead_pos, inactive_toolhead_pos, active_instance, line):
         print("  ! Backup sequence")
-        print("  ! Backup flip: t0 Backing up")
+        print("  ! Backup shuffle: t0 Backing up")
         self.t1_backaway()
-        print("  ! Flipping inactive t1")
-        left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+        print("  ! Shuffling inactive t1")
+        left_toolhead_pos = self.t0_shuffle(inactive_toolhead_pos)
         # Restore original x for active instance
         print("  ! Resuming after backup: t0 restoring to %s" % toolhead_pos)
         self.t1_go_to(toolhead_pos)
@@ -244,7 +244,7 @@ class DuelRunner:
             return 'left'
 
     def play_gcodes(self, input_file):
-        """Execute all G-codes from a file, inserting backups/flips/splits as needed."""
+        """Execute all G-codes from a file, inserting backups/shuffles/splits as needed."""
 
         with open(input_file, 'r') as f:
             gcode = f.read()
@@ -323,57 +323,57 @@ class DuelRunner:
                         if active_instance == 'left':
                             # Target must be on the right.
 
-                            # Simple flip if we're not in the end zone yet.
+                            # Simple shuffle if we're not in the end zone yet.
                             if toolhead_pos.x < TO_X_BACKAWAY:
-                                self.simple_flips += 1
-                                print("  ! Simple flip")
-                                print("  ! Flipping inactive t1")
-                                right_toolhead_pos = self.t1_flip(inactive_toolhead_pos)
+                                self.simple_shuffles += 1
+                                print("  ! Simple shuffle")
+                                print("  ! Shuffling inactive t1")
+                                right_toolhead_pos = self.t1_shuffle(inactive_toolhead_pos)
                                 self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
-                            # Segmented move: active is now in the front, and would conflict with a back-to-front flipped inactive toolhead
+                            # Segmented move: active is now in the front, and would conflict with a back-to-front shuffled inactive toolhead
                             elif toolhead_pos.y <= min_y_to_clear_inactive_toolhead:
-                                self.segmented_flips += 1
+                                self.segmented_shuffles += 1
                                 right_toolhead_pos = self.do_right_segmented_sequence(toolhead_pos, min_y_to_clear_inactive_toolhead,
                                                                                       next_toolhead_pos, inactive_toolhead_pos)
 
                             # Segmented move: active is in the rear
                             elif toolhead_pos.y >= max_y_to_clear_inactive_toolhead:
-                                self.segmented_flips += 1
+                                self.segmented_shuffles += 1
                                 right_toolhead_pos = self.do_right_segmented_sequence(toolhead_pos, max_y_to_clear_inactive_toolhead,
                                                                                       next_toolhead_pos, inactive_toolhead_pos)
 
                             # Backup move.
                             else:
-                                self.backup_flips += 1
+                                self.backup_shuffles += 1
                                 right_toolhead_pos = self.do_right_backup_sequence(toolhead_pos, inactive_toolhead_pos, active_instance, line)
 
                         elif active_instance == 'right':
                             # Target must be on the left.
 
-                            # Simple flip if we're not in the end zone yet.
+                            # Simple shuffle if we're not in the end zone yet.
                             if toolhead_pos.x > X_BACKAWAY_LEN:
-                                self.simple_flips += 1
-                                print("  ! Simple flip")
-                                print("  ! Flipping inactive t0")
-                                left_toolhead_pos = self.t0_flip(inactive_toolhead_pos)
+                                self.simple_shuffles += 1
+                                print("  ! Simple shuffle")
+                                print("  ! Shuffling inactive t0")
+                                left_toolhead_pos = self.t0_shuffle(inactive_toolhead_pos)
                                 self.run_gcode(self.get_active_printer_name(active_instance), line.gcode_str)
 
                             # Segmented move: active is in the front
                             elif toolhead_pos.y <= min_y_to_clear_inactive_toolhead:
-                                self.segmented_flips += 1
+                                self.segmented_shuffles += 1
                                 left_toolhead_pos = self.do_left_segmented_sequence(toolhead_pos, min_y_to_clear_inactive_toolhead,
                                                                                       next_toolhead_pos, inactive_toolhead_pos)
 
                             # Segmented move: active is in the rear
                             elif toolhead_pos.y >= max_y_to_clear_inactive_toolhead:
-                                self.segmented_flips += 1
+                                self.segmented_shuffles += 1
                                 left_toolhead_pos = self.do_left_segmented_sequence(toolhead_pos, max_y_to_clear_inactive_toolhead,
                                                                                       next_toolhead_pos, inactive_toolhead_pos)
 
                             # Backup move.
                             else:
-                                self.backup_flips += 1
+                                self.backup_shuffles += 1
                                 right_toolhead_pos = self.do_left_backup_sequence(toolhead_pos, inactive_toolhead_pos, active_instance, line)
 
                     # If no overlap, just do the straight line.
@@ -440,6 +440,7 @@ if __name__ == "__main__":
     parser.add_argument('--dry-run', help="Dry run", action='store_true')
     parser.add_argument('--m400-always', help="Always run M400 after input moves", action='store_true')
     parser.add_argument('--input', help="Input gcode filepath")
+    parser.add_argument('--output', help="Output gcode filepath")
     parser.add_argument('--mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MODE)
     parser.add_argument('--latency-test', help="Measure latency of command exec", action='store_true')
     parser.add_argument('--verbose', help="Use more-verbose debug output", action='store_true')
