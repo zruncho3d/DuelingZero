@@ -248,7 +248,7 @@ For every travel move, some code:
 
 ... must detect toolhead interference and proactively avoid it to use the full workspace.
 
-Consider any g-code move command (`G0`, `G1`, `G28`, etc.), then ask this question:
+Consider any G-code move command (`G0`, `G1`, `G28`, etc.), then ask this question:
 
 > Would one toolhead (a ~40 mm x 53 mm rectangle in XY, plus some clearance) intersect with the other toolhead's rectangle, at any point in the motion for that move command?  
 
@@ -357,15 +357,15 @@ Rotate the infill direction to 45 degrees, so that the inactive extruder is only
 
 Avoid outer perimeters on large parts to avoid endzone dancing.  For example, go from 4 to 3 outer perimeters and increase the outer perimeter width to compensate.
 
-###### Minimal Flips
+###### Minimal Shuffles
 
-Instead of doing a full-Y-travel move for each flip, what about minimizing the flip distance to only what’s necessary?
+Instead of doing a full-Y-travel move for each flip, what about minimizing the shuffle distance to only what’s necessary?
 
 ###### Simultaneous Motion
 
 The inactive extruder could get out of the way, while the extruder is on the other side, to hide some of the time cost of the dancing.  
 
-Simultaneous motion can be triggered with the two-Klipper control option, where each gantry is independently controlled.  Doing this with RepRapFirmware would require at least minor changes to the generated g-code to drive XY and UV (second-gantry) axes simultaneously.  Any implementation that assumes the use of `T0` and `T1` commands to share XY move commands between gantries cannot enable this.
+Simultaneous motion can be triggered with the two-Klipper control option, where each gantry is independently controlled.  Doing this with RepRapFirmware would require at least minor changes to the generated G-code to drive XY and UV (second-gantry) axes simultaneously.  Any implementation that assumes the use of `T0` and `T1` commands to share XY move commands between gantries cannot enable this.
 
 ###### Preemptive Positioning
 
@@ -385,7 +385,7 @@ A side benefit of Dual Gantry - like IDEX - is the option of simultaneous multi-
 
 However, you could get more flexibility to use the space with a slight bit of slicer awareness.  Imagine offsetting the start Y positions for two mirrored parts so that you get effectively higher overlap than a simple static partitioning (two circles, each larger than half the bed width or height).  You could print two half-bed-size triangles at the same time, for example.
 
-Or, imagine having two streams of independent g-code, where the streams are sync’ed at Z moves.  
+Or, imagine having two streams of independent G-code, where the streams are sync’ed at Z moves.  
 
 [Apparently this will be a thing for RRF for version 3.5](https://forum.duet3d.com/topic/29023/independent-dual-gantry-any-examples-out-there/3?_=1656291960523)!  As of 2022-07-16, this is in beta.
 
@@ -523,7 +523,7 @@ The caveats here are numerous.  Honestly, this approach is just a hack to valida
         * Individual G-code move commands can’t be perfectly split and synchronized between boards, so the extruder must be co-located with the corresponding XY steppers.
             * If using CAN, that means two CAN hats or dongles!  Sigh.  This is why the prototype has two separate CAN buses with one board each, vs one bus with two boards.
 * Potentially lower-quality prints
-    * REST calls add delay to every command, which might create larger part zits from toolhead flips.  On a home network over WiFi, this was in the 20-40ms range per command.  Should be lower with a co-resident duel.py.
+    * REST calls add delay to every command, which might create larger part zits from toolhead shuffles.  On a home network over WiFi, this was in the 20-40ms range per command.  Should be lower with a co-resident duel.py.
 
 `duel.py` uses a few Python modules to simplify the implementation:
 * [gcodeparser](https://pypi.org/project/gcodeparser/): a simple parser to turn ASCII lines into modifiable python objects
@@ -556,18 +556,32 @@ Aside from these bits, the code is pretty straightforward... surprisingly so.
 
 In general, none of the parts here should be a surprise.  
 
-Yes, extrusions will get longer, X rails are longer and need two carriages, and you’ll need longer belts.  You’ll want longer Y rails if doing T0+.
+Yes, extrusions will get longer, X rails are longer, and you’ll need longer belts.  You’ll want longer Y rails if doing T0+.
 
 In fact, it may be cheaper to just buy two V0 kits and supplement with a few parts.  You'll want:
 
 * 2x [250mm MGN7H rails](https://www.aliexpress.com/item/2251832694486732.html?)
-  * Make sure to also buy a ‘Carriage Only’ and message the seller to add it to the rail before they ship it.
+  * Make sure to also buy a ‘Carriage Only’ part and message the seller to add it to the rail before they ship it.
 * [2x 200mm MGN9C rails](https://www.aliexpress.com/item/2251832586981749.htm)
 * 20mm set screws are recommended to double up extrusions, just like noted on the BoxZero GitHub.  
 
 The bottom baseplate has a custom size, but all other panels are simple rectangles.
 
-TBD: sample SCS order
+| Part | Qty | Dimensions |
+| - | - | - |
+| Baseplate | 1x | 339 mm x 259 mm (with cutouts)
+| Front/Back | 2x | 339 mm x 409 mm
+| Sides | 2x | 259 mm x 409 mm
+| Top | 1x | 339 mm x 259 mm
+
+With a 25% discount, a SendCutSend order came to ~$100 including all panels,
+while a Tap Plastics order came to $50 before shipping, but without the baseplate.
+
+Order Samples:
+
+![](Images/orders/scs_order.png)
+
+![](Images/orders/tap_order.png)
 
 #### Size: {Small, Stock, Larger}
 
@@ -595,9 +609,11 @@ TBD: Add frame pic
 
 You can buy 200s and join them to 100s to save a little money too.  
 
-I keep one 100mm extrusion as a souvenir from each V0, but also to test sliders, which need to be matched to the particular extrusion type, and even batch.  Running out of colors from all the V0 builds...
+I keep one 100mm extrusion as a souvenir from each V0, but also to test sliders, which need to be matched to the particular extrusion type, and even batch.
 
-TBD: pic of "souvenir extrusions"
+Running out of colors from all the V0 builds...
+
+![](Images/random/souvenirs.jpeg)
 
 #### Triple-Z vs Single-Z
 
@@ -643,11 +659,15 @@ In general, the CAD should be your primary reference.  Don’t expect 100% of al
 
 #### Build
 
-It’s a cake with layers.  The layers can be done independently, then joined.  You don’t even need to follow this order, but it’s known to work.  In all steps, make sure to add more NDNs that you think might need!  You’ll need a lot, especially as all corners add 4-6 NDs.  
+It’s a cake with layers.  You make the layers independently.
+
+![](Images/build/layers.jpeg)
+
+Then you join them.  
+
+You don’t need to follow the order below, but it’s known to work.  In all steps, make sure to add more NDNs that you think might need!  You’ll need a lot, especially as all corners add 4-6 NDs.  
 
 In all steps, get screws finger tight, but wait until the printer includes all parts to fully tighten all (accessible) screws.
-
-TBD: pic of layers, before and after
 
 Layers:
 * Build the base + skirts layer, along with lower corners.
@@ -769,6 +789,24 @@ For a V2/Trident-style gantry, you’d have to modify the XY joints to support 4
 **Answering as a printer-designer**: it’s a unique and interesting challenge to fit all the belts and toolheads into one gantry, especially in a way that reuses much of what’s out there.  
 
 **Answering as a coder**: there are some interesting - but still reasonable - 2D object interference and path-planning challenges, as well as firmware changes to make this all work.  Plus, there are lots of optimizations to implement and then evaluate.
+
+### Is it still a Voron Zero?
+
+**Z says yes.**
+
+The only printed parts this printer shares with a regular Voron Zero:
+* 9mm spacers
+* Pi mount
+
+Yes, that's it.  So why is it still a Voron Zero?  
+
+Because it wouldn't exist without the V0.  
+
+Because many parts are modifications of existing V0 parts.
+
+Because nearly every non-printed part, including the frame, is a stock V0 part.
+
+So there you go... a V0 in spirit, if not in printed parts.
 
 ## Support?
 
