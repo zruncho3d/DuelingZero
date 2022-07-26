@@ -808,6 +808,29 @@ Because nearly every non-printed part, including the frame, is a stock V0 part.
 
 So there you go... a V0 in spirit, if not in printed parts.
 
+### Seems like a lotta work for a little printer, right?
+
+Well, yes.
+
+But it'd be even more work for a larger printer.
+* It'd be impossible to rotate in your lap as you build it.
+* It'd be impossible to reuse your V0 frame kit.
+* It'd be impossible to store your test build in a file-folder box.
+
+You wouldn't learn anything more.  A bigger printer would take longer to get up to temperature.  It would  have longer, harder-to-tune belts and potentially worse print quality.  It could cost more and require more energy to run.
+
+If you don't routinely print larger objects, and especially if you do
+lots of one-off small part-prototyping prints, you'll find that tiny printers rock.  Check out [3D Printers for Ants](https://3dprintersforants.com) for more examples like this one!
+
+## Future Work
+
+Again, this printer represents a pragmatic "time-to-market" compromise.  
+
+There are lots of ways to make it better.  Here are a few:
+* The Z travel is completely unoptimized.
+* Spools might be relocated into the chamber itself.
+* Symmetric, equal-weight gantries would simplify tuning, with identical Klipper config values (Input Shaper, velocity, accels).  
+
 ## Support?
 
 Post to the Reddit thread; if this gains more traction, then it should probably be its own channel in DoomCube.
