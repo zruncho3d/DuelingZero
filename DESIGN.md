@@ -178,7 +178,7 @@ This notched version is only needed on the high-side gantry, so if converting fr
 
 ![](Renders/walkthrough/idlers_highlighted_side_ortho.png)
 
-These parts are no strictly needed, and in fact, originally the gantry used stock B0 idlers, but they provide visual symmetry with the AB blocks (I know, I know...).
+These parts are not strictly needed, and in fact, originally the gantry used stock B0 idlers, but they provide visual symmetry with the AB blocks (I know, I know...).
 
 ![](Renders/walkthrough/idlers_iso_perspective.png)
 
