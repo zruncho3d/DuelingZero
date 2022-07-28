@@ -67,21 +67,25 @@ But that second toolhead comes at a cost: moving mass, which has real effects on
 
 Whether building a fast race car or a fast printer, physics can't be ignored.  
 
-You can mitigate the moving mass somewhat, by using lighter toolhead, typically with a remote Bowden extruder, but Bowden extruders introduce their own tuning challenges.
+You can mitigate the moving mass somewhat, by using a lighter toolhead, typically with a remote Bowden extruder, but Bowden extruders introduce their own tuning challenges.
 
-With Dual Gantry, you get a no-mass-added, no-downsides gantry for the common case of single-extruder prints.  There’s no hit to max acceleration or any potential ringing issues from dragging around a heavy second toolhead on a longer rail all the time, like on an IDEX.
+**With Dual Gantry, you get a no-mass-added, no-downsides gantry for the common case of single-extruder prints.**
 
-This motion concept fits within a broader space of 3D printer types that support multiple extrusion, where the number of toolheads, hotends, and extruders vary... 1, 2, or N for each of these:
+There’s no hit to max acceleration or any potential ringing issues from dragging around a heavy second toolhead on a longer rail all the time, like on an IDEX.
+
+This motion concept fits within a broader space of 3D printer types that support multiple extrusion, where the number of toolheads, hotends, and extruders vary:
 
 ![alt_text](Diagrams/landscape_of_multiple_extruders.png)
 
-Take a look.  This diagram is not comprehensive, but gives a sense for the depth of the design space.
+Take a look.  This diagram is not comprehensive, but gives a sense for the depth of the design space, and especially, the rarity of everything not on the far left side (typical single-extruder printer).  For some points in the design space, there's only one commercial example!  
+
+Please file an issue if you know of any significant omissions.
 
 ### What’s the catch?
 
 If it sounds too good to be true... it probably is.
 
-You don't have to design it (anymore), but you still need to build it, which is roughly twice the work of a typical printer.  Compared to a typical single-extrusion, single-toolhead 3D printer, there are added cost, complexity, and alignment challenges, many of which are identical to IDEX.
+You don't have to design it (anymore), but you still need to build it, which is roughly twice the work of a typical printer.  Compared to the usual single-extrusion, single-toolhead 3D printer, there are added cost, complexity, and alignment challenges.  Many are identical to IDEX.
 
 **But the main reason you’ve probably never seen a Dual Gantry 3D printer: firmware support.**
 
@@ -91,13 +95,17 @@ Klipper doesn’t, *yet*, but there’s a workaround.
 
 **Regardless,** neither firmware implements the smart avoidance necessary for safe motion within the full area of bed travel.
 
-This is not a blocker anymore, though!  
+This is not a blocker anymore, though!
 
 The code in this repo enables a functioning printer with full bed-travel usage.  See the [Software](SOFTWARE.md) section for a full explanation, with diagrams, pics, and explanations.
 
 ### How does this mod work?
 
-Start with the trusted, tested Voron Zero CoreXY gantry.   Duplicate and rotate it, so that both gantries share the same rails.  Flip the XY joints upside down.  Voila!   
+Start with a trusted, tested Voron Zero CoreXY gantry.   
+
+Copy and paste, then rotate and move it with a touchpad gesture, so that the two share the same rails.
+
+Flip the XY joints upside down.  Voila!   
 
 ![alt_text](Renders/gantry_iso.png)
 
@@ -105,7 +113,7 @@ That’s the core idea.
 
 In practice, though, there are quite a few additional bits to design to make it work.  And like with any V0 mod, the devil is in the packaging details: *every mm matters*.
 
-Each gantry is heavily customized vs a regular V0, to make an underslung low-side gantry (left, in black) as well as an underslung high-side gantry (right, in silver). Beyond these new gantry XY joints, there’s some extra work to relocate the endstops and add a high-side strut; *something* needs to directly resist the forces of the tensioned belt.
+Each gantry is heavily customized vs a regular V0, to make an underslung low-side gantry (left, in black) as well as an underslung high-side gantry (right, in silver). Beyond these new gantry XY joints, there’s some extra work to relocate the endstops and add a high-side strut; *something* needs to directly resist the forces of the tensioned belt.  Oh, and the belts can't pass through a motor on the high side, so you have to figure that one out, too.
 
 Fortunately, most of the other needed parts can be repurposed or at least derived from other designs.  
 
@@ -135,13 +143,14 @@ Highlights of this particular build:
 * More F623 bearings than you’ve ever seen on one printer.  So many!
 * Travel: ~170mm x 165mm in XY, ~130mm in Z (but completely unoptimized)
 * Frame: 360 x 280 x 450 in XYZ.  Enclosure, feet, and displays add a bit to this.
+* Filament: mix of KVP ABS flavors: Metallic Silver, Black, and Stellar Black.
 
 Two control options have been tested:
 * Control Option 1: RepRepFirmware with Duet
     * Duet2 Wifi + Duex5
     * 2x Pancake V0 toolhead boards
     * 5” PanelDue
-* Control Option 2: Klipper
+* Control Option 2: Klipper "Two Ships in the Night" setup
     * Raspberry Pi Zero 2 W
     * 3x SKR Pico controller boards
     * 2x EBB42 toolhead boards
@@ -153,7 +162,9 @@ Flexibility, or fear of commitment… you decide!
 
 ### Learn more!
 
-If you read this far, there's 10x the info beyond this README file, in the repo.
+If you've read this far, great, but you haven't gotten to the good stuff.
+
+There's 10x the info beyond this README file, in the repo, split into multiple pages.
 
 Take a look around, or up at the Table of Contents above.
 
@@ -163,10 +174,8 @@ Take a look around, or up at the Table of Contents above.
 
 Others have built printers or similar CNC devices with at least two gantries operating in a single shared workspace.  Here are some real ones:
 
-* Cronus - a 5-head, single-workspace 3d printer
-    * [https://www.youtube.com/watch?v=TkEOMQ6rQ6s](https://www.youtube.com/watch?v=TkEOMQ6rQ6s)
-* Other dual gantry example in CNC:
-    * [Dual Gantry CNC Machining Centers](https://www.cronsrud.com/cro-dual-gantry.html)
+* [Cronus](https://www.youtube.com/watch?v=TkEOMQ6rQ6s](https://www.youtube.com/watch?v=TkEOMQ6rQ6s) - a 5-head, single-workspace 3d printer
+* [Dual Gantry CNC Machining Centers](https://www.cronsrud.com/cro-dual-gantry.html)
 
 TBD: many, many more links.
 
