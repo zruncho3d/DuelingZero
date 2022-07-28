@@ -192,6 +192,139 @@ Derived, in principle, from the F0 umbilical, but without a cover.  Fits a cable
 
 A potential improvement here: to add push-fit connections on top and bottom, to enable low-friction rotation of the reverse bowden tube, as well as enable variable-length reverse bowden tubes to the filament feed.
 
+
+### Z Motion
+
+#### Z Sliders
+
+Oh yes.  They’re real, and they’re spectacular :smile:.  
+
+TBD: Add YT video showing sliding motion
+
+| ![](Renders/walkthrough/mgn7h_slider_bottom_iso_ortho.png) | ![](Renders/walkthrough/mgn7h_slider_end_ortho.png) | ![](Renders/walkthrough/mgn7h_slider_top_iso_perspective.png) |
+| - | - | - |
+
+They're extremely simple and low-cost. Each uses the geometry from a ZeroPanels panel, extruded, with 4 holes added to match a typical MGN7H carraige.
+
+They're flexible.  Literally... the flex makes it possible to insert and remove them without taking a rail apart.
+
+The key to making them properly is to use the edge of an extrusion as a planer to gently remove a tiny amount of plastic, so that the printed slider fits tightly in place, without backlash or excessive friction. You can get the technique pretty easily, and if you screw up, just throw it away and start again.  Remove move material equally from both ends of one side, gentry, until you notice the grip lessen as you slide the slider in the exact extrusion you'll be using.  Yes, matching each slider to the extrusion helps.  There is surprising variance not just between extrusion brands, but also batches, and even between slots on the same extrusion piece.  You can probably also modify the geomtry slightly to get really close without the planer action.
+
+These work fine without lube, but with a little Super Lube, they’re comparably smooth to actual rails.  Don’t expect them to handle large side or twisting loads, but for the highly constrained loads they have (up and down Z), they seem just fine, especially with the front bedframe and rear Z designs here that support tensioning.
+
+In the future, these can be easily changed to *not* stick out the sides, to enable the use of flush-fitting default V0 side panels.
+
+#### Front Idler Mounts
+
+This is a surprisingly interesting part.
+
+From the front view, you see a boring old box.  
+
+![](Renders/walkthrough/front_idler_base_front_ortho.png)
+
+Soooo boring, right?  But this part hides a secret entrance.
+
+You need space for a screw head to go in, but a straight screw would conflict with the tensioning screw and heatset used with T0.  Sure, you could make this part and the corresponding Z idler wider... unlike T0, the space is available; there's a huge gap from these parts to gantry with the superwide layout.  But  that's lazy talk.  I wanted to keep the parts as stock as possible here, to reduce the time cost of conversions.
+
+The solution: add an oblique-angled access hole for a balldriver to tighten the main screw, combined with a slot to insert that screw without requiring disassembly.
+
+![](Renders/walkthrough/front_idler_base_iso_oblique.png)
+
+You can see the slot above, peeking through the oblique access hole.
+
+| ![](Renders/walkthrough/front_idler_base_bottom.png) | ![](Renders/walkthrough/front_idler_base_side_inner.png) | ![](Renders/walkthrough/front_idler_base_iso.png) |
+| - | - | - |
+
+After all - once you've built the double-gantry unit, you really don't want to take it apart again.   You can’t see the angled hole for screw access, or the area where the part slides in!  Just looks like a box from the outside.
+
+#### Unmodified T0 Rear Z Motor Mount
+
+This one was a happy little accident.
+
+![](Renders/walkthrough/bottom_view_iso_perspective.png)
+
+The T0 rear Z motor mount part did not need to be modified.  The motor is flipped from its usual orientation, with simple spacers added so the belt can escape through.
+
+One part that didn't demand a redesign.... I'll take it.
+
+#### Rear Z "Crossbar Corners"
+
+These take geometry cues from the BoxZero corners:
+
+![](Renders/walkthrough/rear_z_crossbar_corner.png)
+
+They enable a mount for the modified ZeroClick dock, as well as the rear Z parts.
+
+Since no blind joints are used here, this part can slide up and down at will...
+
+#### Unmodified T0 Rear Z Idler Base
+
+... which helps set the rear Z height.  Z can be adjusted after the frame has been built.
+
+![](Renders/walkthrough/rear_z_idler_mount.png)
+
+This whole area is unmodified T0 stuff, currently.
+
+It's absolutely a place where there's tons of opportunity to get back Z, possibly even without parts changes, just by raising the rear Z crossbar and adjusting the Zeroclick dock to match.
+
+It's also a design that isn't truly locked-in, to properly resist Z tensioning forces.  Extending the rear Z idler base to lock against the rear Z crossbar would solve this potential issue, easily.
+
+#### Larger bedframe, with new Wago mounts
+
+This is more of a T0+ thing, but it's worth calling out, until T0+ is separately released and documented.
+
+![](Renders/walkthrough/bed_bottom_iso_perspective.png)
+
+A few small mods were needed:
+* Widened-by-15mm T0 Bedframe Z Mounts
+* Fromt bed mounts adjusted to fit the 180x180 bed.
+
+![](Renders/walkthrough/bed_side_ortho.png)
+![](Renders/walkthrough/bed_front_ortho.png)
+![](Renders/walkthrough/bed_top_ortho.png)
+
+The widened front-corner Z mounts have a side hole added to enable preload adjustment.  Haven't tried these out yet, but they should help with fine-tuning the Z motion, and possibly increasing the friction, intentionally, to increase the bed hold.
+
+### Frame
+
+#### Modified BoxZero Corners
+
+BoxZero corners provide a nice bump in rigidity for 1515 frames.  Instead of a 7.5mm offset with a single screw, most corners have two screws and a 37.5mm offset.
+
+Since the default D0 size is wider, taller, and deeper, it make sense to add 4 more BoxZero corners to the bottom of the frame for even more rigidity.  Since the optimal size seemed close to 330mm, adding 15mm to each end seemed logical, to enable off-the-shelf 300mm extrusion packs.
+
+Here are the 3 new variants, each of which has a mirrored version too:
+
+| ![](Renders/walkthrough/corner_1_iso_ortho.png) | ![](Renders/walkthrough/corner_2_iso_ortho.png) | ![](Renders/walkthrough/corner_3_iso_ortho.png) |
+| - | - | - |
+
+The bottom rear corners provide a large opening for cables, so that 2 stepper cables, an endstop cable, and a full toolhead cable can pass through the frame without issue.
+
+#### Modified ZeroClick Dock
+
+ZeroClick handles probing here.
+
+![](Renders/walkthrough/zeroclick_dock_iso_perspective.png)
+
+The usual ZeroClick Side Dock needed a few mods to fit here: changes to depth, height, and even a shave off the top.
+
+#### Cable Channels
+
+These derive from ones first made available with Double Dragon:
+
+| ![](Renders/walkthrough/cable_carrier_end_perspective.png) | ![](Renders/walkthrough/cable_carrier._iso_perspective.png) |
+| - | - |
+
+There's one on each side of the umbilical receiver to hold and hide the stepper and toolhead cables.
+
+### Other Mods
+
+Even more mods... these were all straightforward:
+* 25mm T0 Side Skirts added for the longer depth
+* 65mm T0 Front Skirts added for the custom width
+
+
+
 ### Prototypes
 
 If you have V0 AB blocks lying around, you can even make a test gantry like this:
