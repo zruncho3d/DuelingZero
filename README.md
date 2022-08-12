@@ -63,7 +63,7 @@ So along comes IDEX, short for Independent Dual Extrusion, which adds a second, 
 
 No drool, plus something cooler: one printer can now print two identical parts simultaneously, in mirror or duplicate modes. :muscle:
 
-Open-source IDEX designs include [Voron](https://vorondesign.com/)-derived ones, like [Zruncho](https://github.com/zruncho3d)’s [Double Dragon](https://github.com/zruncho3d/double-dragon), [Eddietheengineer](https://www.youtube.com/eddietheengineer)'s [Tridex](https://github.com/FrankenVoron/Tridex/), and [Ankurv](https://github.com/ankurv2k6)’s [IDEX Switchwire](https://github.com/ankurv2k6/voron_idex_switchwire)).  There's also the [Muldex](https://github.com/3dprintingworld/MULDEX), and there's no shortage of commercial examples, too: [Sovol SV04](https://sovol3d.com/products/sv04), [FlashForge Creator Pro](https://www.flashforge.com/product-detail/flashforge-creator-pro-2-3d-printer), [BCN Sigma](https://www.bcn3d.com/bcn3d-sigma-d25/), [Jadelabo J1](https://www.jadelabo.com/), and many more.
+Open-source IDEX designs include [Voron](https://vorondesign.com/)-derived ones, like [Zruncho](https://github.com/zruncho3d)’s [Double Dragon](https://github.com/zruncho3d/double-dragon), [Eddietheengineer](https://www.youtube.com/eddietheengineer)'s [Tridex](https://github.com/FrankenVoron/Tridex/), and [Ankurv](https://github.com/ankurv2k6)’s [IDEX Switchwire](https://github.com/ankurv2k6/voron_idex_switchwire).  There's also the [Muldex](https://github.com/3dprintingworld/MULDEX), and there's no shortage of commercial examples, too: [Sovol SV04](https://sovol3d.com/products/sv04), [FlashForge Creator Pro](https://www.flashforge.com/product-detail/flashforge-creator-pro-2-3d-printer), [BCN Sigma](https://www.bcn3d.com/bcn3d-sigma-d25/), [Jadelabo J1](https://www.jadelabo.com/), and many more.
 
 But that second toolhead comes at a cost: moving mass, which has effects on print speed (max accel) and quality (typically, ringing artifacts).  :neutral_face:
 
@@ -97,21 +97,22 @@ You don't have to design it (anymore), but you still need to build it, which is 
 
 **The main reason you probably have never seen a Dual Gantry 3D printer: firmware support.**
 
-RepRapFirmware *does* support two active gantries using one control board.
+Support for two gantries with one control board is a good start:
+* RepRapFirmware: supports two active gantries, out-of-the-box.
+* Klipper: thanks to a collaboration with [tircown](https://github.com/tircown), there's a PR available now.
+* Marlin: no.
 
-Klipper mainline doesn’t, *yet*, but there’s a workaround.
+... but to get full motion out of a shared-workspace printer, you really want active collection detection and avoidance.
 
-Marlin: no.
+**Code in this repo enables a functioning printer with *full* bed-travel usage, for any firmware.**
 
-No firmware implements the smart avoidance necessary for safe motion within the full area of bed travel... but that's no issue anymore.  The code's here.
-
-This repo enables a functioning printer with *full* bed-travel usage.  See the [Software](SOFTWARE.md) section for a full explanation, with diagrams, pics, and explanations.
+See the [Software](SOFTWARE.md) section for a full explanation, with diagrams, pics, and explanations.
 
 ### How does this mod work?
 
-Start with a trusted, tested Voron Zero CoreXY gantry.   
+Start with a trusted, tested Voron Zero CoreXY gantry.  Turn it 90 degrees.
 
-Copy and paste, then rotate and move it with a touchpad gesture, so that the two share the same rails.
+Duplicate the copied gantry, then flip it, and make the two crossbars share the same rails.
 
 Flip the XY joints upside down.  Voila!   
 
@@ -139,38 +140,30 @@ TBD: final images, not the test build!
 
 Highlights of this particular build:
 
-* LDO Red 1515 V0 frame kit, with added MakerBeamXL 300mm, 200mm, and end-joined 50mm pieces
-* [Tri-Zero](https://github.com/zruncho3d/tri-zero) triple-belted Z (simple, low-cost, and fast) with tool-less belt attachments
-* [ZeroClick](https://github.com/zruncho3d/zeroclick) for bed probing
-* Rail-less Z motion (!) using printed MGN7 sliders - **new in this printer**
-* Tool-less, removable-in-seconds sealed enclosure with [Technologic-style ZeroPanels](https://github.com/Tecnologic/ZeroPanels/tree/main/Mods/tecnologic/FlyingZero300/STLs)
-* AC 180x180 [Prusa Mini size plate bed](https://www.aliexpress.com/item/3256803530287164.html) with removable textured PEI sheet
-* 2x [Mini-AfterSherpa](https://github.com/PrintersForAnts/Mini-AfterSherpa) toolheads for Revo Voron
-* 2x [Sherpa Mini](https://github.com/Annex-Engineering/Sherpa_Mini-Extruder) extruders
-* [BoxZero](https://github.com/zruncho3d/BoxZero)-derived motor blocks
-* V0.1-size LRS-150-24 Power Supply
-* [PrinterExperiments](https://github.com/zruncho3d/printer-experiments) code for easier Z nozzle alignment with a single command
-* More F623 bearings than you’ve ever seen on one printer.  So many!
-* Travel: ~170mm x 165mm in XY, ~130mm in Z (but completely unoptimized)
-* Frame: 360 x 280 x 450 in XYZ.  Enclosure, feet, and displays add a bit to this.
-* Filament: mix of KVP ABS flavors: Metallic Silver, Black, and Stellar Black.
-
-These control options have been tested:
-* Control Option 1: RepRepFirmware with Duet
-    * Duet2 Wifi + Duex5
-    * 2x Pancake V0 toolhead boards
-    * 5” PanelDue
-* Control Option 2: Klipper "Two Ships in the Night" setup
-    * Raspberry Pi Zero 2 W
-    * 3x SKR Pico controller boards
-    * 2x EBB42 toolhead boards
-    * Waveshare CAN hat
-    * BTT U2C USB CAN board
-    * Mini 12864 display with [Klipper adapter](https://www.aliexpress.com/item/3256802553287831.html)
-* Control Option 3: Klipper Dual Gantry patch
-    * Similar to above, but 2 boards
-
-Flexibility, or fear of commitment… you decide!
+* XY Motion and Toolhead
+  * Customized [ZeroClick](https://github.com/zruncho3d/zeroclick) for bed probing
+  * 2x [Mini-AfterSherpa](https://github.com/PrintersForAnts/Mini-AfterSherpa) toolheads with [Revo Voron](https://e3d-online.com/products/revo-voron) hotends
+  * 2x [Sherpa Mini](https://github.com/Annex-Engineering/Sherpa_Mini-Extruder) extruders
+  * [BoxZero](https://github.com/zruncho3d/BoxZero)-derived motor blocks
+* Frame and Z Motion
+  * Rail-less Z motion (!) using printed MGN7 sliders - **new in this printer**
+  * Tool-less, removable-in-seconds sealed enclosure with [Technologic-style ZeroPanels](https://github.com/Tecnologic/ZeroPanels/tree/main/Mods/tecnologic/FlyingZero300/STLs)
+  * [Tri-Zero](https://github.com/zruncho3d/tri-zero) triple-belted Z (simple, low-cost, and fast) with tool-less belt attachments
+  * LDO Red 1515 V0 frame kit, with added MakerBeamXL 300mm, 200mm, and end-joined 50mm pieces
+  * AC 180x180 [Prusa Mini size plate bed](https://www.aliexpress.com/item/3256803530287164.html) with textured and smooth PEI sheets
+* Electronics
+  * 2x EBB42 toolhead boards
+  * BTT U2C USB CAN board
+  * LRS-150-24 Power Supply
+  * Raspberry Pi Zero 2 W
+  * 2x SKR Pico controller boards
+  * Mini 12864 display with [Klipper adapter](https://www.aliexpress.com/item/3256802553287831.html)
+* Other
+  * Travel: ~170mm x 165mm in XY, ~130mm in Z (but... completely unoptimized)
+  * Frame: 360 x 280 x 480 in XYZ.  Enclosure, feet, and displays add a bit to this.
+  * Filament: mix of KVP ABS flavors: Metallic Silver, Black, and Stellar Black.
+  * [PrinterExperiments](https://github.com/zruncho3d/printer-experiments) code for easy Z nozzle alignment with a single command
+  * More F623 bearings than you’ve ever seen on one printer.  So many!
 
 ### Learn more!
 
@@ -187,18 +180,18 @@ Take a look around, or up at the Table of Contents above.
 They do exist.  Others have built printers or similar CNC devices with at least two gantries operating in a single shared workspace:
 
 * [Essentium HSE 280i](https://www.essentium.com/3d-printers/high-speed-extrusion-280/): large, high-dollar, linear-servo printer with two gantries
-* [Cronus](https://www.youtube.com/watch?v=TkEOMQ6rQ6s](https://www.youtube.com/watch?v=TkEOMQ6rQ6s) : a 5-head, single-workspace 3d printer
-* [Dual Gantry CNC Machining Centers](https://www.cronsrud.com/cro-dual-gantry.html): asimilar CNC device
+* [Cronus](https://www.youtube.com/watch?v=TkEOMQ6rQ6s): a 5-head, single-workspace 3d printer
+* [Dual Gantry CNC Machining Centers](https://www.cronsrud.com/cro-dual-gantry.html): a related CNC
 * [Earlier motion platform example](https://www.youtube.com/watch?v=S_7VCEe3hOk): dates to 2012!
 
-There are also a bunch of posts online with people conceptualizing the concept dating back years.  The benefits/drawbacks are relatively straightforward to understand, though not widely known.  For a few builds, there are mentions online, but no reference to a video or link to learn more.
+There are also a bunch of posts online with people conceptualizing the concept, dating back years.  The benefits/drawbacks are relatively straightforward to understand, though not widely known.  For a few builds, there are mentions online, but no reference to a video or link to learn more.
 
 * 2018-06-04 [Duet Forum post by 3D_low](https://forum.duet3d.com/topic/5561/did-anyone-make-a-idex-with-dual-x-gantry-bar): "Did anyone pull that off yet? i havent found one on the net."
 * 2018-11-21 [Duet Forum post by Haggan90]((https://forum.duet3d.com/topic/7796/haq-xy/122)): HaqXY is a dual Hybrid-CoreXY
 * 2021-05-01 [Reddit post by u/lowfat](https://www.reddit.com/r/Reprap/comments/n2tkvb/corexy_with_dual_fully_independent_gantries/): postulates DG, but abandoned in favor of a toolchanger
 * 2021-07-21 [Duet Forum post by breed](https://forum.duet3d.com/topic/24258/independant-dual-gantry-corexy/10?_=1657058082320): "Independent Dual Gantry CoreXY"
-* 2021-09-17 [Duet Forum post by oliof](https://forum.duet3d.com/topic/25158/core-xy-idex-with-two-gantries/15): "Core XY - Idex with two gantries", has a nice diagram by Yeti.WST
-* 2022-01-27 [Klipper Discourse post by ](https://klipper.discourse.group/t/dual-gantry-printer-with-single-mcu-btt-gtr-btt-m5/1900): dual gantry printer with single mcu
+* 2021-09-17 [Duet Forum post by oliof](https://forum.duet3d.com/topic/25158/core-xy-idex-with-two-gantries/15): "Core XY - Idex with two gantries", has a nice diagram
+* 2022-01-27 [Klipper Discourse post](https://klipper.discourse.group/t/dual-gantry-printer-with-single-mcu-btt-gtr-btt-m5/1900): Dual gantry printer with single MCU
 * 2022-03-25 [Duet Forum post by dc42](https://forum.duet3d.com/topic/27895/beta-testers-for-multiple-motion-system-support/41): Beta testers for multiple motion system support: simultaneous multi-printing for RRF v3.5.  Note two pictures, for motion designs from breed and slaughter2k
 * 2022-06-23 [Duet Forum post by zruncho](https://forum.duet3d.com/topic/29023/independent-dual-gantry-any-examples-out-there/10): is anything out there?
 

@@ -1,6 +1,6 @@
 ## Software
 
-This early video shows the motion and introduces the core challenge: two toolheads moving in a shared space.  Didn't know if it work would at all when this was made!
+This early video shows the motion and introduces the core challenge: two toolheads moving in a shared space.  I didn't know if it work would at all when this was made!
 
 [add to YouTube as unlisted]
 
