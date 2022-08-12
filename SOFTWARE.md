@@ -10,76 +10,36 @@ There are a few ways to handle the "two toolheads, one workspace" challenge, for
 
 Here are the different cases, visualized, with more details explanations below.
 
-|  | Visualization | Usable Bed Fraction (for D0.000) |
+| Option | Visualization | Notes |
 | - | - | - |
-| Legend | ![](Diagrams/workspace_legend.png) | - |
-| Single Toolhead: full workspace | ![](Diagrams/workspace_single.png) | 100% |
-| Dual Toolhead, Option 1: Park in Opposite Corners| ![](Diagrams/workspace_dual_corners.png) | ~50% |
-| Dual Toolhead, Option 2: Park in Back | ![](Diagrams/workspace_dual_sameside.png) | ~47% |
-| Dual Toolhead, With Interference Detection and Avoidance | ![](Diagrams/workspace_single.png) | **~100%** |
+| ![](Diagrams/title_legend.png) | ![](Diagrams/workspace_legend.png) | - |
+| **Single Toolhead**: <p><p>Full Workspace <p><p> 100% travel | ![](Diagrams/workspace_single.png) | Ditch one of the toolheads, and Dual Gantry reduces to a single CoreXY. You can leave the inactive toolhead on and lose a corner of printable space, or you can remove the second toolhead to get nearly the full printable space. <p><p> If you mostly print in one color/material, this full travel is ... well, useful! <p><p> In a way, your daily driver for single-extrusion prints can also be the project car for the weekend (multi-material and multi-color).  But that’s not why we’re here, is it?|
+|  |  |  |
+| **Dual Toolhead Modes** without collision detection and avoidance (below) | | These modes works similarly to an IDEX, where a toolchange macro (typically `T0` or `T1`) parks the now-inactive toolhead, and motion then continues with the newly-active toolhead.  These methods can be implemented with simple toolchange macros, but firmware simplicity comes at the cost of some printable space.|
+| **Dual Toolhead**, Option 1: <p><p>Park in Opposite Corners <p><p> **~47%** usable travel | ![](Diagrams/workspace_dual_corners.png) | Use the front left area, possibly with a regular V0 bed. You lose a toolhead's depth of X travel and a toolhead’s width of Y travel, yielding a nearly-square build area. |
+| **Dual Toolhead**, Option 2: <p><p>Park in Back, <p>Print in Center <p>  **~50%** usable travel | ![](Diagrams/workspace_dual_sameside.png) | Use the center area.  It’s just like an IDEX here; you lose twice the depth of a toolhead in the X direction, but retain full Y.   |
+| **Dual Toolhead**, Option 3:<p><p>Park in Back, <p>Print in Front <p><p> **~75%** usable travel | ![](Diagrams/workspace_dual_sameside_front.png) | Use the front area, and leverage a gantry design that can overlap in X, for more printable space.  Requires toolchange macros to move the active gantry back into the workspace first. |
+| **Dual Toolhead**, Option 4: <p><p> Stay Within the Lines <p><p> **~85%** usable travel | ![](Diagrams/workspace_dual_toolhead_stay_in_lines.png) | Use the front area in addition to the middle rear area, but assume each toolhead parks in a far corner.  <p><p> Requires a diligent slicer operator or the smart slicer itself to ensure that motion commands stay within the lines: cutting corners here could result in a collision.  Seems like a pretty-good option though. |
+| | | |
+| **Dual Toolhead Modes** *with* collision detection and avoidance (below) | | |
+| **Dual Toolhead**, Option 5: <p><p>Interference Detection and Avoidance <p><p> **100%** usable travel | ![](Diagrams/workspace_single.png) | Ahhh yes.  Where it gets interesting! <p><p> For every travel move, some code:... must detect toolhead interference and proactively avoid it to use the full workspace. <p><p> **Read below for details.** |
 
-### Single Toolhead
+It all makes me want to play some Tetris on a 1989 Game Boy, and play long enough to see a Buran take off again at the credits screen.
 
-Ditch one of the toolheads, and Dual Gantry reduces to a single CoreXY.  You can leave the inactive toolhead on and lose a corner of printable space, or you can remove the second toolhead to get nearly the full printable space.
+Anyway, for the calculations that drive the usable-travel numbers above, check [this spreadsheet]().
 
-If you mostly print in one color/material, this full travel is ... well, useful!  **Can’t do that with an IDEX.**
+It includes travel losses for a sample V0-size D0, along with a hypothetical Voron 2.4 gantry variant.
 
-In a way, your daily driver for single-extrusion prints can also be the project car for the weekend (multi-material and multi-color).  But that’s not why we’re here, is it?
-
-### Dual Toolhead, No Interference Detection
-
-This mode works similarly to an IDEX, where a toolhead activation macro (typically `T0` or `T1`) parks the now-inactive toolhead, and motion then continues with the newly-active toolhead.  This method is simple to implement and RRF can already handle it, but firmware simplicity comes at the cost of printable space.
-
-Options below assume that a V0-style carriage is used, which sets the homing direction.  Once homed, the toolheads can hang out on either side.
-
-##### Option 1: Park in Opposite Corners
-
-Use the front left area, possibly with a regular V0 bed.  You lose a toolhead's depth of X travel and a toolhead’s width of Y travel, yielding a nearly-square build area, in the front left or rear right.  For the prototype, ~170 x ~170 bed → ~125 x ~115 usable.
-
-##### Option 2: Park in Back
-
-Use the center area.  It’s just like an IDEX here; you lose twice the depth of a toolhead in the X direction, but retain full Y.  For the prototype, ~170 x ~170 bed → ~80 x ~170 usable.
-
-##### Usable Workspace with Two Heads
-
-For both options, to avoid collisions, the toolhead-park macro must move the head in the X first, then the Y, to the parking position, out of the way.  
-
-That’s it.  
-
-There’s no sophistication needed, beyond triggering a `T0` or `T1` macro to park a head.  But that space loss is a big deal at smaller sizes.
-
-For a 140 x 120 travel Dueling Zero (300mm X extrusions, 200mm Y extrusions), with a 55 x 45 toolhead, parking in opposite corners:
-
-    1.0 - (95.0 * 65) / (140 * 120) = 63% loss
-
-Put another way - you're throwing away almost 2/3 of the available build space.  That's not acceptable.
-
-For a 170 x 170 travel default Dueling Zero (330mm X, 250mm Y), with a 55 x 45 toolhead, parking at opposite corners:
-
-    1.0 - (125.0 * 115) / (170 * 170) = ~50% loss
-
-At bigger bed sizes, the loss is much smaller.  For example, for a port of Dueling Zero to a 350 x 350 printer, parking at opposite corners, with a 50 x 60 toolhead, the loss would be:
-
-    1.0 - (290.0 * 300.0) / (350 * 350) = 29% loss
-
-You can overcome the loss in all cases here by going with ~50mm wider X and Y extrusions and wider panels; you don’t even really need a bigger bed.  But that means a larger, heavier printer, with more air to heat up, longer belt runs, and potentially more challenges with tuning.  
-
-For rear parking with the default Dueling Zero, we're looking at a similar, but slightly larger, loss:
-
-    1.0 - (90.0 * 170.0) / (170 * 170) = ~53% loss
-
-The loss is a bit higher vs parking at opposite-corners, because the dead zones don't overlap.
-
-### Dual Toolhead, With Interference Detection and Avoidance
+### Interference Detection and Avoidance
 
 **Ahhh yes.  Where it gets interesting!  Read on.**
 
 For every travel move, some code:
-* slicer with geometry knowledge
-* G-code post-processor with geometry knowledge
+* slicer
+* G-code post-processor
 * firmware
 
-... must detect toolhead interference and proactively avoid it to use the full workspace.
+... must detect toolhead interferences and proactively avoid them in the full workspace.
 
 Consider any G-code move command (`G0`, `G1`, `G28`, etc.), then ask this question:
 
@@ -226,7 +186,7 @@ You can then print completely different parts at the same time.  How cool is tha
 
 ### Current Software Implementations
 
-The software and firmware side will be an evolving space - to implement the optimizations described above, but also to reduce the complexity of configuration and tuning for new builds.
+The software and firmware side for Dual Gantry printers will be an evolving space - to implement the optimizations described above, but also to reduce the complexity of configuration and tuning for new builds.
 
 **Watch out for new stuff here.  Join in!**
 
@@ -277,14 +237,18 @@ To support that case, you would need to make at least these changes:
 
 Klipper supports a massive ecosystem of control boards, sees new features added frequently (especially Input Shaper), and supports many toolhead boards that work well in a printer with tiny toolheads like Dueling Zero.
 
-As of 2022-06-25, however, Klipper does not *directly* support a Dual Gantry printer.
+As of 2022-08-12, however, Klipper mainline does not *directly* support a Dual Gantry printer.
 
-##### Klipper-internal Dual Gantry Support: not yet
+No problem.   Head to this repo for a working, on-the-path-to-merge-upstream patch.
 
-A direct, single-board-possible implementation of additional U and V axis support for CoreXY might look something like this:
+GO HERE
+
+##### Klipper-internal Dual Gantry Support
+
+The direct, single-board implementation of additional U and V axis support for CoreXY looks like this:
 
     [printer]
-    kinematics: dual_corexy
+    kinematics: dualgantry_corexy
     ...
     [stepper_u]
     ...
@@ -294,15 +258,6 @@ A direct, single-board-possible implementation of additional U and V axis suppor
     ...
     [extruder1]
     ...
-
-That could be followed up with something to enable the no-avoidance case, similarly to the [[dual_carriage]](https://www.klipper3d.org/Config_Reference.html#dual_carriage) config option:
-
-    [dual_gantry]
-    gantry0_extruder: extruder
-    gantry1_extruder: extruder1
-    ...
-
-Again, the above does exist... it's a suggested interface for users.
 
 But such changes would require more familiarity with Klipper internals and development.  In the meantime, we have other options.
 
@@ -326,37 +281,6 @@ This file would hopefully provide a starter config for future single-board Klipp
   * the right `Y` endstop to the `E0` input.
 
 This config only covers the gantry, intentionally.
-
-##### Klipper-external Dual Gantry Support: yes, with caveats
-
-An alternative is to use two gantries with two Klipper instances on two boards.
-
-See `src/duel.py` for a provided Python program (duel.py) which implements this “externalized control” approach.   
-
-TBD: Picture: one pi (outer rectangle), two Moonrakers on two ports, two Klippers, two boards, two config dirs, showing distinct moonraker ports and multi-printer Fluidd/Mainsal config.
-
-Each Klipper instance has no idea about the existence of the other gantry! **They’re "ships in the night".**
-
-The control program knows the position of each toolhead at all times.  It reads in a G-code file from a slicer and sends each command to the correct gantry, as well as manages switching between the two.  
-
-For example, when `T0` is seen in the G-code stream, the other toolhead must be parked, and the control program emits the G-code for that.  Critically, this program implements `M400` calls to drain the move queue; it must wait for each move to complete before starting any other move that could put the two toolheads in danger of colliding.  Ask Zruncho how he knows about this…
-
-Each G-code is triggered by doing a [POST to a Moonraker web server](https://moonraker.readthedocs.io/en/latest/web_api/#gcode-apis) in front of the gantry-specific Klipper instance.  The control program runs on a nearby laptop or on the controlling Pi.
-
-The caveats here are numerous.  Honestly, this approach is just a hack to validate smart avoidance algorithms more easily, but it works.  Issues include:
-* More Complex
-    * You need two of everything.
-    * Slightly higher memory load from two Klippers and Moonrakers and UIs.
-    * The control program may not divert all G-codes properly, so watch out.
-* Less Usable
-    * Can’t initiate or check the progress of a print from the UI.
-* Less Flexible
-    * Static partitioning of steppers across boards is not ideal.
-        * All Z steppers need to be on the same Klipper/Moonraker instance, so you may need more boards just to run 3 Z steppers from one place.
-        * Individual G-code move commands can’t be perfectly split and synchronized between boards, so the extruder must be co-located with the corresponding XY steppers.
-            * If using CAN, that means two CAN hats or dongles!  Sigh.  This is why the prototype has two separate CAN buses with one board each, vs one bus with two boards.
-* Potentially lower-quality prints
-    * REST calls add delay to every command, which might create larger part zits from toolhead shuffles.  On a home network over WiFi, this was in the 20-40ms range per command.  Should be lower with a co-resident duel.py.
 
 `duel.py` uses a few Python modules to simplify the implementation:
 * [gcodeparser](https://pypi.org/project/gcodeparser/): a simple parser to turn ASCII lines into modifiable python objects
