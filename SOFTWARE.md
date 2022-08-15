@@ -16,19 +16,23 @@ Here are the different cases, visualized, with more details explanations below.
 | **Single Toolhead**: <p><p>Full Workspace <p><p> 100% travel | ![](Diagrams/workspace_single.png) | Ditch one of the toolheads, and Dual Gantry reduces to a single CoreXY. You can leave the inactive toolhead on and lose a corner of printable space, or you can remove the second toolhead to get nearly the full printable space. <p><p> If you mostly print in one color/material, this full travel is ... well, useful! <p><p> In a way, your daily driver for single-extrusion prints can also be the project car for the weekend (multi-material and multi-color).  But that’s not why we’re here, is it?|
 |  |  |  |
 | **Dual Toolhead Modes** without collision detection and avoidance (below) | | These modes works similarly to an IDEX, where a toolchange macro (typically `T0` or `T1`) parks the now-inactive toolhead, and motion then continues with the newly-active toolhead.  These methods can be implemented with simple toolchange macros, but firmware simplicity comes at the cost of some printable space.|
-| **Dual Toolhead**, Option 1: <p><p>Park in Opposite Corners <p><p> **~47%** usable travel | ![](Diagrams/workspace_dual_corners.png) | Use the front left area, possibly with a regular V0 bed. You lose a toolhead's depth of X travel and a toolhead’s width of Y travel, yielding a nearly-square build area. |
-| **Dual Toolhead**, Option 2: <p><p>Park in Back, <p>Print in Center <p>  **~50%** usable travel | ![](Diagrams/workspace_dual_sameside.png) | Use the center area.  It’s just like an IDEX here; you lose twice the depth of a toolhead in the X direction, but retain full Y.   |
-| **Dual Toolhead**, Option 3:<p><p>Park in Back, <p>Print in Front <p><p> **~75%** usable travel | ![](Diagrams/workspace_dual_sameside_front.png) | Use the front area, and leverage a gantry design that can overlap in X, for more printable space.  Requires toolchange macros to move the active gantry back into the workspace first. |
-| **Dual Toolhead**, Option 4: <p><p> Stay Within the Lines <p><p> **~85%** usable travel | ![](Diagrams/workspace_dual_toolhead_stay_in_lines.png) | Use the front area in addition to the middle rear area, but assume each toolhead parks in a far corner.  <p><p> Requires a diligent slicer operator or the smart slicer itself to ensure that motion commands stay within the lines: cutting corners here could result in a collision.  Seems like a pretty-good option though. |
+| **Dual Toolhead**, Option 1: <p><p>Park in Opposite Corners <p><p> **49.7%** usable travel | ![](Diagrams/workspace_dual_corners.png) | Use the front left area, possibly with a regular V0 bed. You lose a toolhead's depth of X travel and a toolhead’s width of Y travel, yielding a nearly-square build area. |
+| **Dual Toolhead**, Option 2: <p><p>Park in Back, <p>Print in Center <p>  **47.1%** usable travel | ![](Diagrams/workspace_dual_sameside.png) | Use the center area.  It’s just like an IDEX here; you lose twice the depth of a toolhead in the X direction, but retain full Y.   |
+| **Dual Toolhead**, Option 3:<p><p>Park in Back, <p>Print in Front <p><p> **67.6%** usable travel | ![](Diagrams/workspace_dual_sameside_front.png) | Use the front area, and leverage a gantry design that can overlap in X, for more printable space.  Requires toolchange macros to move the active gantry back into the workspace first. |
+| **Dual Toolhead**, Option 4: <p><p> Stay Within the Lines <p><p> **82.9%** usable travel | ![](Diagrams/workspace_dual_toolhead_stay_in_lines.png) | Use the front area in addition to the middle rear area, but assume each toolhead parks in a far corner.  <p><p> Requires a diligent slicer operator or the smart slicer itself to ensure that motion commands stay within the lines: cutting corners here could result in a collision.  Seems like a pretty-good option though. |
 | | | |
 | **Dual Toolhead Modes** *with* collision detection and avoidance (below) | | |
 | **Dual Toolhead**, Option 5: <p><p>Interference Detection and Avoidance <p><p> **100%** usable travel | ![](Diagrams/workspace_single.png) | Ahhh yes.  Where it gets interesting! <p><p> For every travel move, some code:... must detect toolhead interference and proactively avoid it to use the full workspace. <p><p> **Read below for details.** |
 
 It all makes me want to play some Tetris on a 1989 Game Boy, and play long enough to see a Buran take off again at the credits screen.
 
-Anyway, for the calculations that drive the usable-travel numbers above, check [this spreadsheet]().
+Anyway, for the calculations that drive the usable-travel numbers above, as well as V0 and V2 sizes, check [this spreadsheet](https://docs.google.com/spreadsheets/d/12tuhSCjSPbqNk4CZrzta5T9k3skF8ElGdcyRElUPhNI/edit?usp=sharing).
 
-It includes travel losses for a sample V0-size D0, along with a hypothetical Voron 2.4 gantry variant.
+At smaller bed sizes, the simple options drastically reduce the usable bed size, motivating the use of interference detection and avoidance.  At larger sizes, there's less loss.  
+
+Sure, you can always go "one size up" on the extrusions to get 100% usable bed fraction, by going with ~50mm wider X and Y extrusions and wider panels, and doing something simple, like *Park in Opposite Corners*.  But that means a larger, heavier printer, with more air to heat up, longer belt runs, and potentially more challenges with tuning.
+
+If you can get 100% of the usable bed with software... why not use that?
 
 ### Interference Detection and Avoidance
 
@@ -237,50 +241,30 @@ To support that case, you would need to make at least these changes:
 
 Klipper supports a massive ecosystem of control boards, sees new features added frequently (especially Input Shaper), and supports many toolhead boards that work well in a printer with tiny toolheads like Dueling Zero.
 
+##### Klipper Patch for Dual Gantry CoreXY
+
 As of 2022-08-12, however, Klipper mainline does not *directly* support a Dual Gantry printer.
 
-No problem.   Head to this repo for a working, on-the-path-to-merge-upstream patch.
+No problem.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), there is a single patch for this.
 
-GO HERE
+GO HERE.
 
-##### Klipper-internal Dual Gantry Support
+**Configuration:**
 
-The direct, single-board implementation of additional U and V axis support for CoreXY looks like this:
+To use Dual Gantry support, the minimal Klipper configuration must:
+* Add [stepper_u] and [stepper_v] sections for the second gantry, along with corresponding stepper-driver sections
+* Specify `kinematics: dualgantry_corexy` in the printer section
+* Define T0 and T1 macros with SET_DUAL_CARRIAGE inside
 
-    [printer]
-    kinematics: dualgantry_corexy
-    ...
-    [stepper_u]
-    ...
-    [stepper_v]
-    ...
-    [extruder]
-    ...
-    [extruder1]
-    ...
+A sample file to configure a full printer with 2x SKR Pico boards and 2x CAN toolhead boards is avaliable in [link TBD]().
 
-But such changes would require more familiarity with Klipper internals and development.  In the meantime, we have other options.
+However, all kinds of other stuff must evolve when going from one to two extruders.  `PRINT_START`, `CANCEL`, even `HOME`, are all are macros that really need dual-extruder awareness to prevent collisions in all cases.  Take a look at these.
 
-##### Single-board Test Config: yes, with caveats {#single-board-test-config-yes-with-caveats}
+#### Software Smart Avoidance
 
-See `Configs/Klipper/single_board_test` for a single-board Klipper config for an SKR Pico that is useful for testing all endstops and gantries.   This enables a Single Toolhead starting point, for either toolhead.
+This repo includes a G-code postprocessor called duel.py that modifies a G-Code file to safely handle all movement cases.  It has to assume a starting position and needs the specific toolhead-size and XY motion bounds.  
 
-One gantry config goes into each file {`left.cfg`, `right.cfg`} and only one can be enabled at a time.  You can uncomment/comment one file at a time, then restart Klipper, to check endstops and gantry motion, but you can’t use this config for actual two-gantry motion.  By the way, the gantry sides have the same axis extents, but have opposing endstop-position configs.
-
-This file would hopefully provide a starter config for future single-board Klipper gantry control.  
-
-* **Steppers:** wire up:
-  * `X` to the rear left stepper
-  * `Y` to the front left stepper
-  * `Z` to the front right stepper
-  * `E` to the rear right stepper
-* **Endstops:** wire up:
-  * the left-gantry `X` endstop to the `X` input
-  * the left `Y` endstop to the `Y` input
-  * the right `X` endstop to the `Z` input
-  * the right `Y` endstop to the `E0` input.
-
-This config only covers the gantry, intentionally.
+TBD: instructions on how to add to a slicer.
 
 `duel.py` uses a few Python modules to simplify the implementation:
 * [gcodeparser](https://pypi.org/project/gcodeparser/): a simple parser to turn ASCII lines into modifiable python objects
@@ -288,12 +272,6 @@ This config only covers the gantry, intentionally.
 * [cmd](https://docs.python.org/3/library/cmd.html): a simple way in Python to do interactive programs.  “Battle mode” is a little easter egg.
 * [shapely](https://pypi.org/project/Shapely/): a geometry library
 * [nose](https://pypi.org/project/nose/): test-running library
-
-There’s some config needed to get this all running, but nothing too bad, and it’s noted in the Firmware Instructions section below.
-
-#### Software Smart Avoidance
-
-The control program (`duel.py`) needs to process G-code anyway, so it might as well also add the G-code commands needed for safe motion.   All 4 cases for interference are implemented.
 
 The polygon intersect from Shapely enables interference detection.
 
@@ -308,3 +286,5 @@ That code looks like this, with a function `get_toolhead_bounds()` to get toolhe
 One mildly interesting bit is the move split needed for the Segmented Avoidance case, which can be handled with basic y = mx + b math.  
 
 Aside from these bits, the code is pretty straightforward... surprisingly so.
+
+`duel.py` is also capable of driving two independent Klipper instances in a "Ships in the Night"-style setup.  This code enabled me to validate the avoidance algorithms on a real printer, before modifying Klipper, but for all kinds of reasons, the integrated Klipper version is better: no static port partitioning, no easy ability to use a shared nozzle endstop, and no ability to use a single web interface for the whole printer, amongst other issues.
