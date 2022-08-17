@@ -24,11 +24,11 @@ from point import Point
 from battle import Battle
 
 
-# Modes:
+# Movement Modes:
 # - simple: if a conflicting move were to occur, exit the program.
 # - smart: intelligently handle conflicting moves, by inserting backups, splits, and shuffles.
-MODES = ['simple', 'smart']
-DEF_MODE = 'simple'
+MOVE_MODES = ['simple', 'smart']
+DEF_MOVE_MODE = 'simple'
 
 
 # Set this high enough to handle any command(s) you'd run.
@@ -66,14 +66,14 @@ class DuelRunner:
     def __init__(self, args):
         self.left = None
         self.right = None
-        self.mode = 'smart'
+        self.move_mode = 'smart'
         self.m400_always = False
         self.args = None
         self.dry_run = False
         if args is not None:
             self.left = args.left  # URL of left-side Moonraker instance
             self.right = args.right  # URL of left-side Moonraker instance
-            self.mode = args.mode  # mode in MODES
+            self.move_mode = args.move_mode  # mode in MOVE_MODES
             self.m400_always = args.m400_always
             self.args = args
             self.dry_run = args.dry_run
@@ -321,7 +321,7 @@ class DuelRunner:
                 # (2) Check swept area against inactive bounding box
                 overlap_swept = check_for_overlap_sweep(toolhead_pos, next_toolhead_pos, inactive_toolhead_pos)
 
-                if self.mode == 'simple':
+                if self.move_mode == 'simple':
                     if overlap_rect:
                         print("  ! Bounding boxes overlap: %s %s.  Exiting." % (inactive_toolhead_pos, next_toolhead_pos))
                         sys.exit(1)
@@ -330,7 +330,7 @@ class DuelRunner:
                               (toolhead_pos, next_toolhead_pos, next_toolhead_pos))
                         sys.exit(1)
 
-                elif self.mode == 'smart':
+                elif self.move_mode == 'smart':
                     # Check if a single move will suffice.
                     if overlap_rect or overlap_swept:
                         self.run_gcode(self.get_active_printer_name(active_instance), "M400")
@@ -449,8 +449,8 @@ class DuelRunner:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run a Dual Gantry printer.")
-    parser.add_argument('left', help="T0 (left) printer address - something like dz.local")
-    parser.add_argument('right', help="T1 (right) printer address - something like dz.local")
+    parser.add_argument('--left', help="T0 (left) printer address - something like dz.local")
+    parser.add_argument('--right', help="T1 (right) printer address - something like dz.local")
     parser.add_argument('--battle', help="Begin battle!", action='store_true')
     parser.add_argument('--meet', help="Meet in center", action='store_true')
     parser.add_argument('--home', help="Home first", action='store_true')
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     parser.add_argument('--m400-always', help="Always run M400 after input moves", action='store_true')
     parser.add_argument('--input', help="Input gcode filepath")
     parser.add_argument('--output', help="Output gcode filepath")
-    parser.add_argument('--mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MODE)
+    parser.add_argument('--move_mode', help="Interference mode: simple fails, smart splits moves", default=DEF_MOVE_MODE)
     parser.add_argument('--latency-test', help="Measure latency of command exec", action='store_true')
     parser.add_argument('--verbose', help="Use more-verbose debug output", action='store_true')
 
