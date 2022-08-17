@@ -24,8 +24,8 @@ More changes were needed than originally expected, and this section tries to sum
 
 Highlights:
 
-* No fundamentally new non-printed parts are needed.  You don’t need to cut any extrusions, and few holes needed to be drilled.
-* The entire gantry floats within the frame.  After building, you can loosen 12 screws and then slide it up or down, to balance umbilical rubbing against Z travel.
+* No fundamentally new non-printed parts are needed.  You don’t need to cut any extrusions, and few holes need to be drilled.
+* The entire gantry floats within the frame.  After building, you can loosen 12 screws and then slide it up or down to balance umbilical rubbing against Z travel.
 * Correct, *there are no Z rails*.  This is not a CAD mistake.  I didn’t feel like buying any, and I didn’t know the optimal size anyway.  Printed sliders work fine as a replacement for rails, and you should expect more info about them soon.  If you want proper Z rails, no problem! They'll fit in place, just like on a regular T0.
 
 ### XY Motion
@@ -65,12 +65,12 @@ These are a flipped-upside-down version of the original V0.1 XY joints:
 
 ![](Renders/walkthrough/low_side_front_ortho.png)
 
-The flipped orientation enables both gantries to share the same pair of rails.  A few counterbores had to be reversed and height for extrusion mounting needed a lil' adjustment, but that was it.
+The flipped orientation enables both gantries to share the same pair of rails.  A few counterbores had to be reversed and the height for extrusion mounting needed a lil' adjustment, but that was it.
 
 | ![](Renders/walkthrough/low_side_xy_joint_assembly.png) | ![](Renders/walkthrough/low_side_xy_joint_ortho.png) | ![](Renders/walkthrough/low_side_xy_joint_only_iso.png) |
 | - | - | - |
 
-The endstop mounting on one side is simple and adjustable.  It's a hole for a screw to form a thread in the right spot.  The edge of a SHCS hits the plunger on a microswitch, directly.
+The endstop mounting on one side is simple and adjustable.  It's a hole for a screw to form a thread.  The edge of a SHCS hits the plunger on a microswitch, directly.
 
 ![](Renders/walkthrough/low_side_xy_joint_endstop.png)
 
@@ -334,7 +334,7 @@ If you have V0 AB blocks lying around, you can even make a test gantry like this
 
 This was the first test gantry to prove out the concept.  BoxZero AB blocks are a much better fit, though, as they enable you to build the gantry separately, then drop it into the frame from the top.  
 
-The second test gantry moved to BoxZero-derived ABs, with additional width and length, and lived for a bit in a "stubby Z" test config.  This one had a unpowered Z travel of 10mm (!), but helped iterate on gantry and bed parts.  In particular, the test gantry made clear that achieving a target X motion of 170mm would require adding width.
+The second test gantry moved to BoxZero-derived ABs, with additional width and length, and lived for a bit in a "stubby Z" test config.  This one had an unpowered Z travel of 10mm (!), but it helped with iterating on gantry and bed parts.  In particular, the test gantry made clear that achieving a target X motion of 170mm would require adding width.
 
 | ![alt_text](Images/test_build/top.jpg) | ![alt_text](Images/test_build/front.jpg) | ![alt_text](Images/test_build/side.jpg) |
 | - | - | - |

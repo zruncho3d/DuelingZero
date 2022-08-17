@@ -4,9 +4,11 @@
 
 Enable dual-color, dual-material, and dual-part printing... with the same speed and quality as single-extruder printing.
 
-Mod a [Voron Zero](https://vorondesign.com/voron0.1), or build one fresh!
+Mod a [Voron Zero](https://vorondesign.com/voron0.1) or build one fresh!
 
-**D0** is the only open-source, fully-documented, reproducible-by-anyone Dual Gantry printer out there.  And yes... it prints.
+**D0** is the only open-source, fully-documented, reproducible-by-anyone Dual Gantry printer out there.  
+
+And yes... it prints.
 
 TBD: Youtube Video link
 
@@ -23,7 +25,7 @@ Renders:
 
 ## Release History
 
-### 2022-08-X: Alpha-1  
+### 2022-08-20: Alpha-1  
 This first release covers everything you need to build and run your own Dueling Zero: CAD, STLs, DXFs, sample firmware configs, smart avoidance code, G-code streaming code, instructions, and a parts list... everything but an illustrated manual.  But if you're reading this, you almost certainly don't need a manual, anyway.
 
 To make it easy for anyone to grok this crazy Dual Gantry layout - and learn about its opportunities and challenges, both in hardware and software - this README walks through the software and the design.
@@ -102,7 +104,7 @@ Support for two gantries with one control board is a good start:
 * Klipper: thanks to a collaboration with [tircown](https://github.com/tircown), there's a PR available now.
 * Marlin: no.
 
-... but to get full motion out of a shared-workspace printer, you really want active collection detection and avoidance.
+... but to get full motion out of a shared-workspace printer, you really want active collision detection and avoidance.
 
 **Code in this repo enables a functioning printer with *full* bed-travel usage, for any firmware.**
 
@@ -197,10 +199,19 @@ There are also a bunch of posts online with people conceptualizing the concept, 
 
 Please raise an issue for this repo to update the list of links if you come across one!  There’s no pretense of true originality here.
 
-### Other
+### Related
 
 * [Bill Deckingham’s beast](https://www.youtube.com/watch?t=488&v=O_whcaAJpfs&feature=youtu.be): a CoreXYUVAB system, with extra axes for a very different reason.  Maybe some software lessons or relevant RRF config here?
 * [Hashprinter](https://forum.duet3d.com/topic/24287/hash-printer-with-super-simple-gantry/2): super simple gantry
+* TAMV = Tool Alignment with Machine Vision: a way to automate XY calibration
+  * [Jubilee Toolchanger page](https://jubilee3d.com/index.php?title=TAMV)
+  * [HaythamB fork](https://github.com/HaythamB/TAMV)
+  * [TAMV on Klipper](https://github.com/TypQxQ/TAMV)
+* [Klipper PR by Tircown that adds duplication and mirror modes](https://github.com/Klipper3d/klipper/pull/4464)
+* [PitStop3](https://mihaidesigns.com/pages/pitstop-3-multi-material-3d-printer): hotend-swapping multi-material printer
+* [Swapper3D](https://www.kickstarter.com/projects/bigbrain3d/swapper3d): nozzle-swapping multi-material printer
+* [Enraged Rabbit Project](https://github.com/EtteGit/EnragedRabbitProject): add multimaterial capability
+* [3D Chamaleon](https://www.3dchameleon.com/): automatic color changer
 
 ## Credits
 
@@ -211,7 +222,6 @@ Please raise an issue for this repo to update the list of links if you come acro
 Thanks for providing feedback that helped make this clear and concise.
 * Nemgrea: none of this would have happened without a solid base. Even if there’s one functional part here in common, and it’s about the simplest part possible (9mm spacer), this project is proudly a V0 derivative.  99% new or modded, sure, but still a derivative.
 
-* [Klipper PR by Tircown that adds duplication and mirror modes](https://github.com/Klipper3d/klipper/pull/4464)
 
 ## Support?
 

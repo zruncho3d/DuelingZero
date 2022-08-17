@@ -184,7 +184,7 @@ However, you could get more flexibility to use the space with a slight bit of sl
 
 Or, imagine having two streams of independent G-code, where the streams are sync’ed at Z moves.  
 
-[Apparently this will be a thing for RRF for version 3.5](https://forum.duet3d.com/topic/29023/independent-dual-gantry-any-examples-out-there/3?_=1656291960523)!  As of 2022-07-16, this is in beta.
+[Apparently this will be a thing for RRF for version 3.5](https://forum.duet3d.com/topic/29023/independent-dual-gantry-any-examples-out-there/3?_=1656291960523)!
 
 You can then print completely different parts at the same time.  How cool is that?  IDEX can never do that.
 
