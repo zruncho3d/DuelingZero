@@ -202,7 +202,14 @@ Please raise an issue for this repo to update the list of links if you come acro
 * [Bill Deckingham’s beast](https://www.youtube.com/watch?t=488&v=O_whcaAJpfs&feature=youtu.be): a CoreXYUVAB system, with extra axes for a very different reason.  Maybe some software lessons or relevant RRF config here?
 * [Hashprinter](https://forum.duet3d.com/topic/24287/hash-printer-with-super-simple-gantry/2): super simple gantry
 
-### IDEX Software
+## Credits
+
+* Nemgrea: props on making a solid V0 start
+* Tircown: made a single-Klipper-instance version possible, with his code and live debugging
+* Initial conversations proved motivating, with Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others, that this wasn’t completely insane,.
+* Reviewers:
+Thanks for providing feedback that helped make this clear and concise.
+* Nemgrea: none of this would have happened without a solid base. Even if there’s one functional part here in common, and it’s about the simplest part possible (9mm spacer), this project is proudly a V0 derivative.  99% new or modded, sure, but still a derivative.
 
 * [Klipper PR by Tircown that adds duplication and mirror modes](https://github.com/Klipper3d/klipper/pull/4464)
 
