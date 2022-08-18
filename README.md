@@ -130,6 +130,15 @@ Fortunately, most of the other needed parts can be repurposed or at least derive
 
 **D0 Alpha-1** heavily leverages off-the-shelf parts from the [BoxZero](https://github.com/zruncho3d/BoxZero) and [TriZero](https://github.com/zruncho3d/tri-zero) mods, plus a few custom parts and custom panels.
 
+If you're not familiar with these mods, here's a pic, showing a Plus50-size Tri-Zero + BoxZero printer (170x170 bed motion), next to a V0-size (120x120 bed motion) Tri-Zero + BoxZero.
+
+![](Renders/iso-both.png)
+
+[TriZero](https://github.com/zruncho3d/tri-zero) adds automatic bed leveling and enables XY scalability.
+
+[BoxZero](https://github.com/zruncho3d/BoxZero) ditches the tophat.
+
+
 ### Is it real?
 
 Yes.
@@ -215,13 +224,10 @@ Please raise an issue for this repo to update the list of links if you come acro
 
 ## Credits
 
-* Nemgrea: props on making a solid V0 start
-* Tircown: made a single-Klipper-instance version possible, with his code and live debugging
-* Initial conversations proved motivating, with Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others, that this wasn’t completely insane,.
-* Reviewers:
-Thanks for providing feedback that helped make this clear and concise.
-* Nemgrea: none of this would have happened without a solid base. Even if there’s one functional part here in common, and it’s about the simplest part possible (9mm spacer), this project is proudly a V0 derivative.  99% new or modded, sure, but still a derivative.
-
+* **Tircown**: made a single-Klipper-instance version possible, with his code and live debugging
+* **Reviewers: Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.
+* **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
+* **Nemgrea**: none of this would have happened without a solid base.
 
 ## Support?
 
