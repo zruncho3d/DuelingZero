@@ -22,7 +22,7 @@ Here are the different cases, visualized, with more details explanations below.
 | **Dual Toolhead**, Option 4: <p><p> Stay Within the Lines <p><p> **82.9%** usable travel | ![](Diagrams/workspace_dual_toolhead_stay_in_lines.png) | Use the front area in addition to the middle rear area, but assume each toolhead parks in a far corner.  <p><p> Requires a diligent slicer operator or the smart slicer itself to ensure that motion commands stay within the lines: cutting corners here could result in a collision.  Seems like a pretty-good option though. |
 | | | |
 | **Dual Toolhead Modes** *with* collision detection and avoidance (below) | | |
-| **Dual Toolhead**, Option 5: <p><p>Interference Detection and Avoidance <p><p> **100%** usable travel | ![](Diagrams/workspace_single.png) | Ahhh yes.  Where it gets interesting! <p><p> For every travel move, some code:... must detect toolhead interference and proactively avoid it to use the full workspace. <p><p> **Read below for details.** |
+| **Dual Toolhead**, Option 5: <p><p>Interference Detection and Avoidance <p><p> **100%** usable travel | ![](Diagrams/workspace_single.png) | Ahhh yes.  Where it gets interesting! <p><p> For every travel move, some code must detect toolhead interference and proactively avoid it to use the full workspace. <p><p> **Read below for details.** |
 
 It all makes me want to play some Tetris on a 1989 Game Boy, and play long enough to see a Buran take off again at the credits screen.
 
@@ -49,82 +49,24 @@ Consider any G-code move command (`G0`, `G1`, `G28`, etc.), then ask this questi
 
 > Would one toolhead (a ~40 mm x 53 mm rectangle in XY, plus some clearance) intersect with the other toolhead's rectangle, at any point in the motion for that move command?  
 
-There are four distinct cases of motion here, at least when the toolheads are small relative to the travel. An American football analogy will help us here:
+There are four distinct cases of motion here, at least when the toolheads are small relative to the travel.
 
-![](Diagrams/cases_endzones.png)
+An American football analogy will help us here.
 
-The **"endzones"** are in the far X positions, on each side.  
-
-An endzone begins where one toolhead would potentially collide with the other far-X-position toolhead.
+| American Football Field | Dueling Zero Workspace |
+| - | - |
+| ![](Diagrams/football_field_large.png) | ![](Diagrams/cases_endzones.png) |
+|  |  |
+| The **"endzones"** are in the far X positions, on each side.  | An endzone begins where one toolhead would potentially collide with the other far-X-position toolhead. |
 
 We'll walk through the four distinct cases.
 
-#### (1) No Avoidance Needed
-
-An interference can only occur if the move goes to a far X edge - to the endzone.  If the move doesn’t start or enter either endzone, and the inactive extruder is parked in the endzone, then nothing smart is needed.
-
-![](Diagrams/case1.png)
-
-#### (2) Simple Avoidance
-
-If a move enters the endzone and there's a detected collision - more precisely:
-
-> “the bounds of the active toolhead’s travel intersect the inactive toolhead's bounds"
-
-…then an active intervention, in the form of an **"endzone shuffle"**, is needed.  This will be our term for an inactive toolhead moving from the front to the back, or the back to the front, to get out of the way of the active toolhead.
-
-![](Diagrams/case2.png)
-
-Say the inactive extruder is in the way - in a corner - and is approached via an X move.  The inactive extruder must get out of the way, by doing an endzone shuffle.  To minimize print artifacts, a filament retract is needed here, followed by the original move.  This is the simple avoidance case:
-
-* (1) shuffle inactive toolhead
-* (2) do original move
-
-Full-length endzone shuffles (corner-to-corner moves) are not required, or optimal, but are simpler to implement and explain.  Assume for the rest of the discussion here that all toolhead parking is in a corner.
-
-#### (3) Backup-X Avoidance
-
-Now, imagine that the active extruder is in the endzone, in a location where the inactive toolhead would smack into the active extruder during the shuffle, but the active toolhead is not overlapping the final location of the inactive one.
-
-![](Diagrams/case3.png)
-
-Here, the answer is to back the active toolhead out of the way first.  The sequence looks like this:
-
-* (1) back up the active toolhead: move it out of the “endzone”
-* (2) shuffle inactive toolhead
-* (3) restore X position of active toolhead
-* (4) do original move
-
-The picture shows a bit more backup than absolutely needed, but you get the idea.
-
-#### (4) Segmented Avoidance
-
-If the inactive toolhead’s shuffle would cause it to overlap with the current active extruder’s position - when it’s in the corner of an endzone - we need to do something a little smarter.
-
-Say the left toolhead is inactive in the rear left corner, and then the right toolhead continues on a counter-clockwise circle along the edge of the print area, getting to the front left.  The toolheads are now in opposite corners of the same endzone.
-
-| There is no single move that works.  The two toolheads must switch positions, and the move must be split.
-
-Time to do an "**endzone dance**"!
-
-![](Diagrams/200.gif)
-
-The dance looks like this:
-
-![](Diagrams/case4.png)
-
-The move command is split into two parts:
-* The first part moves the active toolhead into a position where it will no longer interfere with the inactive extruder, post-shuffle.  
-* The second part completes the original move from the partway point.  
-
-The sequence looks like this:
-* (1) do first part of the original move
-* (2) back up the active toolhead: move it out of the “endzone”
-* (3) flip inactive toolhead
-* (4) restore X position of active toolhead
-* (5) do second part of the original move
-
-The first part of the move is necessary to ensure that the Y position of the active toolhead “just clears” the future position of the post-shuffle inactive toolhead.
+| Case | Explanation |
+| - | - |
+| ![](Diagrams/case1.png) | **Case 1: No Avoidance Needed**<p><p>An interference can only occur if the move goes to a far X edge - to the endzone.  If the move doesn’t start or enter either endzone, and the inactive extruder is parked in the endzone, then nothing smart is needed. |
+| ![](Diagrams/case2.png) | **Case 2: Simple Avoidance**<p><p>If a move enters the endzone and there's a detected collision - more precisely: <p><p>“the bounds of the active toolhead’s travel intersect the inactive toolhead's bounds" <p><p> …then an active intervention, in the form of an **"endzone shuffle"**, is needed.  This will be our term for an inactive toolhead moving from the front to the back, or the back to the front, to get out of the way of the active toolhead.  <p><p>Say the inactive extruder is in the way - in a corner - and is approached via an X move.  The inactive extruder must get out of the way, by doing an endzone shuffle.  To minimize print artifacts, a filament retract is needed here, followed by the original move.  This is the simple avoidance case:<p><p>(1) shuffle inactive toolhead<p><p>(2) do original move.<p><p>Full-length endzone shuffles (corner-to-corner moves) are not required, or optimal, but are simpler to implement and explain.  Assume for the rest of the discussion here that all toolhead parking is in a corner.
+| ![](Diagrams/case3.png) | **Case 3: Backup-X Avoidance**<p><p>Now, imagine that the active extruder is in the endzone, in a location where the inactive toolhead would smack into the active extruder during the shuffle, but the active toolhead is not overlapping the final location of the inactive one.<p><p>Here, the answer is to back the active toolhead out of the way first.  The sequence looks like this:<p><p>(1) back up the active toolhead: move it out of the “endzone”<p><p>(2) shuffle inactive toolhead<p><p>(3) restore X position of active toolhead<p><p>(4) do original move<p><p>The picture shows a bit more backup than absolutely needed, but you get the idea. |
+| ![](Diagrams/case4.png) | **Case 4: Segmented Avoidance**<p><p>If the inactive toolhead’s shuffle would cause it to overlap with the current active extruder’s position - when it’s in the corner of an endzone - we need to do something a little smarter.<p><p>Say the left toolhead is inactive in the rear left corner, and then the right toolhead continues on a counter-clockwise circle along the edge of the print area, getting to the front left.  The toolheads are now in opposite corners of the same endzone.<p><p>*There is no single move that works.  The two toolheads must switch positions, and the move must be split.*<p><p>Time to do an "**endzone dance**"! ![](Diagrams/200.gif)<p><p>The move command is split into two parts.  The first part moves the active toolhead into a position where it will no longer interfere with the inactive extruder, post-shuffle. The second part completes the original move from the partway point.  <p><p>The sequence looks like this:<p><p>(1) do first part of the original move<p><p>(2) back up the active toolhead: move it out of the “endzone”<p><p>(3) flip inactive toolhead<p><p>(4) restore X position of active toolhead<p><p>(5) do second part of the original move<p><p>The first part of the move is necessary to ensure that the Y position of the active toolhead “just clears” the future position of the post-shuffle inactive toolhead.
 
 Endzone dancing adds print time and the potential for print artifacts (from retractions), but it’s necessary to use the full travel.  When does it happen?
 
@@ -139,8 +81,6 @@ More generally, endzone dancing is needed for each outer perimeter of a full-siz
 > This is the downside of the Dual Gantry approach. It is what it is.
 
 However, some straightforward techiques can help us avoid it.
-
-TBD: Table summarizing techniques, with parts.
 
 ###### Rotate Long Parts
 
@@ -194,17 +134,18 @@ The software and firmware side for Dual Gantry printers will be an evolving spac
 
 **Watch out for new stuff here.  Join in!**
 
-At minimum, any Dual Gantry-capable firmware needs to control both gantries, but you also need *something* to ensure safety and insert moves with added G-codes.  
+At minimum, any Dual Gantry-capable firmware needs to control both gantries.  If you want full travel, you also need *something* to ensure safety and insert moves with added G-codes.  
 
-You’ll need to align the toolheads in XYZ too.  Z alignment can be done with a shared Tri-Zero nozzle endstop. XY alignment is the same process as with an IDEX, of either measuring with Vernier-style or other test prints or macros, or connecting up to a camera and using machine vision (TBD: add TAMV link).
+You’ll need to align the toolheads in XYZ too.  Z alignment can be easily automated with a shared Tri-Zero nozzle endstop. XY alignment is the same process as with an IDEX, of either:
+* measuring with Vernier-style or other test prints or macros
+* jogging printer motion with an upward-facing nozzle camera to measure the temp offset
+* connecting up to a camera and using machine vision a la [TAMV](https://jubilee3d.com/index.php?title=TAMV)
 
 Below are your software options.. at least, the ones that come from Zruncho with :heart:.
 
 #### RepRapFirmware (RRF)
 
 RRF has built-in support for CoreXYUV built-in, which makes it stupid simple here to at least get the axes in motion.  You select this printer type with a single G-code command, where you map the X, Y, U, and V axes to your printer control board’s stepper outputs.  Then you configure a homing macro to home all axes, and then you add macros to execute on each toolchange, specifically, to park the toolheads in opposing corners.
-
-TBD: link to config within repo.
 
 As long as the slicer spits out `T0` and `T1` commands, like for an IDEX, everything should then “just work”, for the `Dual Toolhead, No Avoidance Needed` case.
 
@@ -214,11 +155,11 @@ In fact, the main Duet/RRF developer, David Crocker, made it easy and general fo
 
 > "...after I implemented CoreXY, CoreXZ, Core XYU and CoreXYUV kinematics, I got fed up with having to add a new kinematics class every time someone wanted another variant of CoreXY. That is why RRF now has a universal linear kinematics class, which supports any kinematics for which the motion of every axis is a linear combination of the motion of each axis motor, up to the maximum number of axes supported."
 
-That’s our setup.  
+That’s what we have here - a 2 simple linear combinations for motion.
 
 Nice going, David!  Impressive foresight.
 
-RRF “just works” here.  There is a known-good configuration for a Duet 2 Wifi board in the Configs/ folder.   
+RRF “just works” here.  There is a known-good configuration for a Duet 2 Wifi board in the `Configs/Duet2RRF` folder.   
 
 NOTE: This config is gantry-only. You’ll need to add your Z and E config.
 
@@ -233,7 +174,7 @@ For the curious, here are the most relevant RepRapFirmware documentation pages:
 
 To support that case, you would need to make at least these changes:
 
-* Change printer config type to not map XY and UV axes to XY (in the M669 command, change away from type K8, probably to K1 and with a custom movement matrix)
+* Change printer config type to not map XY and UV axes to XY motion commands: in the M669 command, change away from type K8, probably to K1 and with a custom movement matrix
 * Generate separate XY and UV commands in the G-code post-processor
 * Replace `T0` and `T1` macros with G-code equivalents
 
@@ -243,7 +184,7 @@ Klipper supports a massive ecosystem of control boards, sees new features added 
 
 ##### Klipper Patch for Dual Gantry CoreXY
 
-As of 2022-08-12, however, Klipper mainline does not *directly* support a Dual Gantry printer.
+As of 2022-08-18, however, Klipper mainline does not *directly* support a Dual Gantry printer.
 
 No problem.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), there is a single patch for this.
 
@@ -264,7 +205,7 @@ However, all kinds of other stuff must evolve when going from one to two extrude
 
 This repo includes a G-code postprocessor called duel.py that modifies a G-Code file to safely handle all movement cases.  It has to assume a starting position and needs the specific toolhead-size and XY motion bounds.  
 
-TBD: instructions on how to add to a slicer.
+TODO: instructions on how to add to a slicer.
 
 `duel.py` uses a few Python modules to simplify the implementation:
 * [gcodeparser](https://pypi.org/project/gcodeparser/): a simple parser to turn ASCII lines into modifiable python objects
