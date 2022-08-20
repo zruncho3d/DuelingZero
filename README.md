@@ -8,11 +8,11 @@ Mod a [Voron Zero](https://vorondesign.com/voron0.1) or build one fresh!
 
 **D0** is the only open-source, fully-documented, reproducible-by-anyone Dual Gantry printer out there.  
 
-And yes... it prints.
+It's real, and it prints.
 
-TBD: Youtube Video link
+# [> > > Watch Video from first prints](https://youtu.be/2YI3_g30EwA)
 
-![alt_text](Images/test_build/top.jpg)
+[![alt_text](Images/first_print_thumbnail.png)](https://youtu.be/2YI3_g30EwA)
 
 ![alt_text](Renders/iso.png)
 
@@ -20,8 +20,6 @@ Renders:
 
 | ![alt_text](Renders/top-2.png) | ![alt_text](Renders/front.png) | ![alt_text](Renders/side.png) |
 | - | - | - |
-
-"Real thing" pics coming soon - with wiring, enclosure, fully-built toolheads, etc.
 
 ## Release History
 
@@ -147,8 +145,6 @@ The first D0 build from Zruncho puts a [Tri-Zero](https://github.com/zruncho3d/t
 
 ![](Images/build/together.jpg)
 
-TBD: final images, not the test build!
-
 Highlights of this particular build:
 
 * XY Motion and Toolhead
@@ -228,7 +224,3 @@ Please raise an issue for this repo to update the list of links if you come acro
 * **Reviewers: Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.
 * **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
 * **Nemgrea**: none of this would have happened without a solid base.
-
-## Support?
-
-Post to the Reddit thread; if this gains more traction, then it should probably be its own channel in DoomCube.
