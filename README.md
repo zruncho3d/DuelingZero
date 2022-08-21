@@ -14,8 +14,6 @@ It's real, and it prints.
 
 [![alt_text](Images/first_print_thumbnail.png)](https://youtu.be/2YI3_g30EwA)
 
-[![name](link to image on GH)](link to your URL)
-
 ![alt_text](Renders/iso.png)
 
 Renders:
