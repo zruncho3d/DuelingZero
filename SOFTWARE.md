@@ -2,9 +2,7 @@
 
 This early video shows the motion and introduces the core challenge: two toolheads moving in a shared space.  I didn't know if it work would at all when this was made!
 
-[add to YouTube as unlisted]
-
-[https://discord.com/channels/460117602945990666/982515287704354856/982518947876327425](https://discord.com/channels/460117602945990666/982515287704354856/982518947876327425)
+[Early video showing motion in a shared space](https://www.youtube.com/watch?v=kvWQ7X1aL_c)
 
 There are a few ways to handle the "two toolheads, one workspace" challenge, for a single print.
 
