@@ -87,7 +87,7 @@ Dual Gantry is in an interesting point in a larger space.  **Medium money, mediu
 
 ![alt_text](Diagrams/landscape_of_multiple_extruders.png)
 
-Take a look.  This diagram is not comprehensive, but gives a sense for the depth of the design space, and especially, the rarity of everything not on the far left side (typical single-extruder printer).  For some interesting points in the design space, there's only one commercial example!  
+Take a look here, or at [this other helpful categorization](https://gist.github.com/kmcallister/6636d88802ba00432c65d14e9431c0e6).  This diagram is not comprehensive, but gives a sense for the depth of the design space, and especially, the rarity of everything not on the far left side (typical single-extruder printer).  For some interesting points in the design space, there's only one commercial example!  
 
 (Please file an issue on GitHub if you know of any significant omissions.)
 
