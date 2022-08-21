@@ -14,6 +14,8 @@ It's real, and it prints.
 
 [![alt_text](Images/first_print_thumbnail.png)](https://youtu.be/2YI3_g30EwA)
 
+[![name](link to image on GH)](link to your URL)
+
 ![alt_text](Renders/iso.png)
 
 Renders:
@@ -30,7 +32,7 @@ To make it easy for anyone to grok this crazy Dual Gantry layout - and learn abo
 
 Enjoy!  There's a lot of content here, and I hope you enjoy it as much as I did bringing this concept to life.  -Z.
 
-Join the [Reddit thread (TBD)]() on `r/VoronDesign` for any comments, questions, or kudos.
+Join the [Reddit thread (https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/)]() on `r/VoronDesign` for any comments, questions, or kudos.
 
 ## Table of Contents
 
@@ -224,3 +226,7 @@ Please raise an issue for this repo to update the list of links if you come acro
 * **Reviewers: Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.
 * **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
 * **Nemgrea**: none of this would have happened without a solid base.
+
+## Support
+
+There's a [Reddit thread](https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/) on `r/VoronDesign` for any comments or questions.
