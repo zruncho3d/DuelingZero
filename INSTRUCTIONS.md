@@ -82,38 +82,3 @@ Do all the wiring. Note stepper orientations:
 The order for the two gantries is not the same, intentionally, because of the reversed orientation of one gantry to the other.
 
 Stepper, endstop, and toolhead (CAN) wires are meant to pass through the rear BoxZero-style corners.
-
-TBD: pic of underside wiring and near-steppers wiring
-
-## Firmware Instructions
-
-### “Two of everything but the Pi” Klipper Config notes {#“two-of-everything-but-the-pi”-klipper-config-notes}
-
-* Install as usual on a Pi; I used MainsailOS.
-* Install [KIAUH](https://github.com/th33xitus/kiauh) per repo instructions.
-* Using KIAUH, remove the existing MainsailOS image-installed Klipper and Moonraker.  You can leave Mainsail.
-* Using KIAUH, add 2 instances of Klipper and Moonraker.
-* For simplicity (two UIs simultaneously), add Fluidd via KIAUH
-    * Call the Klipper instances klipper-right and klipper-left
-    * Call the Moonraker instances moonraker-left and moonraker-right
-* In ``/home/pi/klipper_config`, add `left/` and `right/`` dirs.
-    * Into each, copy any needed config.
-* Ensure there is a left and right systemd service for each kind and side.
-    * Check files like `/etc/systemd/system/moonraker-right.service` - that kinda thing.
-* Mod configs for Moonraker services to reference the correct distinct config file directories.
-    * vim /etc/systemd/system/moonraker-right.service
-    * Example changes:
-
-          [Service]
-          ...
-          Environment=MOONRAKER_CONF=/home/pi/klipper_config/**right**/moonraker.conf
-          ...
-          Environment=MOONRAKER_LOG=/home/pi/klipper_logs/moonraker-right.log
-
-* Reload changes services as needed
-    * `sudo systemctl daemon-reload`
-* Mod fluidd local config to connect to the second Moonraker instance.
-    * Imagine you have two Moonrakers at `dz.local:7125` and `dz.local:7126`, with fluid on port 81.
-    * Mod right/moonraker.conf: CORS change to add `http://dz.local:81/` so Moonraker-right can connect.
-    * URL was the Moonraker one defined in fluidd/mainsail (duh!) - Add a printer and put the second URL in, something like `http://dz.local:7126/`.
-* Make sure each Klipper references the correct side in printer.cfg - a one-line change.

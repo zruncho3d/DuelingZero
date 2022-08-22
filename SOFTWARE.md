@@ -201,9 +201,7 @@ However, all kinds of other stuff must evolve when going from one to two extrude
 
 #### Software Smart Avoidance
 
-This repo includes a G-code postprocessor called duel.py that modifies a G-Code file to safely handle all movement cases.  It has to assume a starting position and needs the specific toolhead-size and XY motion bounds.  
-
-TODO: instructions on how to add to a slicer.
+This repo includes a G-code processing code called duel.py that receives a G-Code file to safely handle all movement cases.  It has to assume a starting position and needs the specific toolhead-size and XY motion bounds.  
 
 `duel.py` uses a few Python modules to simplify the implementation:
 * [gcodeparser](https://pypi.org/project/gcodeparser/): a simple parser to turn ASCII lines into modifiable python objects

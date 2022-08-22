@@ -69,6 +69,6 @@ If you’re not a fan of cantilevers (Zruncho's hand just raised, too...), and y
 
 #### Control Boards
 
-The control board situation is up to you, but make sure to consider the need to split the gantries across two boards with the current Klipper option (see note above in Klipper section).  In theory, any boards should be fine, as long as you get enough steppers.
+The control board situation is up to you.  In theory, any boards should be fine, as long as you get enough steppers.  I've tried out a Duet2 Wifi for XY testing and have used a dual SKR Pico setup, which is extremely compact.  Both setups have sample code in the repo.
 
-CAN toolhead boards are highly recommended, as they reduce your wiring, and enable the use of stock 8-driver boards.  But remember, until Klipper supports two gantries on one instance, you’ll need at least two CAN-bus boards. :thumbsdown:
+CAN toolhead boards are highly recommended, as they reduce your wiring, and enable the use of stock 8-driver boards.
