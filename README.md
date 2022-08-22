@@ -203,7 +203,7 @@ They do exist.  Others have built printers or similar CNC devices with at least 
 There are also a bunch of posts online with people conceptualizing the concept, dating back years.  The benefits/drawbacks are relatively straightforward to understand, though not widely known.  For a few builds, there are mentions online, but no reference to a video or link to learn more.
 
 * 2018-06-04 [Duet Forum post by 3D_low](https://forum.duet3d.com/topic/5561/did-anyone-make-a-idex-with-dual-x-gantry-bar): "Did anyone pull that off yet? i havent found one on the net."
-* 2018-11-21 [Duet Forum post by Haggan90]((https://forum.duet3d.com/topic/7796/haq-xy/122)): HaqXY is a dual Hybrid-CoreXY
+* 2018-11-21 [Duet Forum post by Haggan90](https://forum.duet3d.com/topic/7796/haq-xy/122): HaqXY is a dual Hybrid-CoreXY
 * 2021-05-01 [Reddit post by u/lowfat](https://www.reddit.com/r/Reprap/comments/n2tkvb/corexy_with_dual_fully_independent_gantries/): postulates DG, but abandoned in favor of a toolchanger
 * 2021-07-21 [Duet Forum post by breed](https://forum.duet3d.com/topic/24258/independant-dual-gantry-corexy/10?_=1657058082320): "Independent Dual Gantry CoreXY"
 * 2021-09-17 [Duet Forum post by oliof](https://forum.duet3d.com/topic/25158/core-xy-idex-with-two-gantries/15): "Core XY - Idex with two gantries", has a nice diagram
