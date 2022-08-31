@@ -199,7 +199,7 @@ A potential improvement here: to add push-fit connections on top and bottom, to 
 
 Oh yes.  They’re real, and they’re spectacular :smile:.  
 
-TBD: Add YT video showing sliding motion
+## [>>> See YouTube video of sliding motion!](https://youtu.be/JXZt2rP1yQQ)
 
 | ![](Renders/walkthrough/mgn7h_slider_bottom_iso_ortho.png) | ![](Renders/walkthrough/mgn7h_slider_end_ortho.png) | ![](Renders/walkthrough/mgn7h_slider_top_iso_perspective.png) |
 | - | - | - |
