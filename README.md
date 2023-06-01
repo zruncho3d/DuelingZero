@@ -200,11 +200,12 @@ They do exist.  Others have built printers or similar CNC devices with at least 
 * [Dual Gantry CNC Machining Centers](https://www.cronsrud.com/cro-dual-gantry.html): a related CNC
 * [Earlier motion platform example](https://www.youtube.com/watch?v=S_7VCEe3hOk): dates to 2012!
 
-There are also a bunch of posts online with people conceptualizing the concept, dating back years.  The benefits/drawbacks are relatively straightforward to understand, though not widely known.  For a few builds, there are mentions online, but no reference to a video or link to learn more.
+There are also a bunch of posts online with people conceptualizing the concept, dating back years.  The benefits/drawbacks are relatively straightforward to understand, though not widely known.  For a few builds, there are mentions online, but no reference to a video of the machine printing, or a link to learn more.
 
 * 2018-06-04 [Duet Forum post by 3D_low](https://forum.duet3d.com/topic/5561/did-anyone-make-a-idex-with-dual-x-gantry-bar): "Did anyone pull that off yet? i havent found one on the net."
 * 2018-11-21 [Duet Forum post by Haggan90](https://forum.duet3d.com/topic/7796/haq-xy/122): HaqXY is a dual Hybrid-CoreXY
-* 2021-05-01 [Reddit post by u/lowfat](https://www.reddit.com/r/Reprap/comments/n2tkvb/corexy_with_dual_fully_independent_gantries/): postulates DG, but abandoned in favor of a toolchanger
+* 2021-03-01 [r/3Dprinting post by u/m47812]](https://www.reddit.com/r/3Dprinting/comments/lv8ksv/developed_a_new_kind_of_dual_extruder_system_on/): "CODEX" project.  Video shows a fairly far-along dual-gantry; describes collaborative mode too.  Abandoned as of 2023 in favor of a toolchanger.
+* 2021-05-01 [r/Reprap post by u/lowfat](https://www.reddit.com/r/Reprap/comments/n2tkvb/corexy_with_dual_fully_independent_gantries/): postulates DG, but abandoned in favor of a toolchanger
 * 2021-07-21 [Duet Forum post by breed](https://forum.duet3d.com/topic/24258/independant-dual-gantry-corexy/10?_=1657058082320): "Independent Dual Gantry CoreXY"
 * 2021-09-17 [Duet Forum post by oliof](https://forum.duet3d.com/topic/25158/core-xy-idex-with-two-gantries/15): "Core XY - Idex with two gantries", has a nice diagram
 * 2022-01-27 [Klipper Discourse post](https://klipper.discourse.group/t/dual-gantry-printer-with-single-mcu-btt-gtr-btt-m5/1900): Dual gantry printer with single MCU
