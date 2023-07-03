@@ -246,7 +246,7 @@ Please raise an issue for this repo to update the list of links if you come acro
 
 ## Support
 
-The best place to ask questions and see the latest is on the DoomCube Discord, where many Printers For Ants builders hang out.  Go to the ``#dueling-zero-dev` thread in the #tri-zero channel.  Put your build log in the `#build_logs` showcase forum there too!
+The best place to ask questions and see the latest is on the DoomCube Discord, where many Printers For Ants builders hang out.  Go to the `#dueling-zero-dev` thread in the #tri-zero channel.  Put your build log in the `#build_logs` showcase forum there too!
 
 There's also a [Reddit thread](https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/) on `r/VoronDesign` for any comments or questions.
 
