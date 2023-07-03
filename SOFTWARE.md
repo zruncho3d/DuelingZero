@@ -180,26 +180,32 @@ To support that case, you would need to make at least these changes:
 
 Klipper supports a massive ecosystem of control boards, sees new features added frequently (especially Input Shaper), and supports many toolhead boards that work well in a printer with tiny toolheads like Dueling Zero.
 
-##### Klipper Patch for Dual Gantry CoreXY
+##### Klipper Kinematics Patch for Dual Gantry CoreXY
 
-As of 2022-08-18, however, Klipper mainline does not *directly* support a Dual Gantry printer.
+As of 2023-07-03, Klipper mainline code does not *directly* support a Dual Gantry printer.   Which is fine... Kevin (the main Klipper dev) has a high bar for Klipper additions - ideally having value to many people - and there aren't many Dueling Zeros.  
 
-No problem.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), there is a GitHub branch with the code required:
+No problem, though.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), code is avialable here:
 
 * [GitHub Klipper fork with Dual Gantry additions](https://github.com/zruncho3d/klipper/tree/dual_gantry_main)
 
-You'll have to change your local Klipper code to use the dual_gantry_main branch, plus you'll nhave to restart Klipper so that the new code takes effect.  
+You'll have to change your local Klipper code to use the dual_gantry_main branch, plus you'll have to restart Klipper so that the new code takes effect.  
 
-Since the changes live entirely within a single file (`klippy/kinematics/dualgantry_corexy.py`), there's a good chance that if you rebase this code to the latest Klipper, it will "just work".  The chances of getting all this stuff merged are slim-to-none at the moment, given that Kevin (the main Klipper dev's) has a high bar for Klipper additions, ideally having value to many people, and there aren't many Dueling Zeros.  There's a chicken-and-egg situtation here, but it's resolved when enough people have these, share them, and show the code running.
+Since the changes live entirely within a single file (`klippy/kinematics/dualgantry_corexy.py`), there's a good chance that if you rebase this code to the latest Klipper, it will "just work". There's a chicken-and-egg situtation here toward a mainline release that can only be resolved when enough people have these, share them, and show the code running.  Then it justifies a merge, and it's even easier for the next people to get them.
+
+**NOTE: HERE BE DRAGONS**.  There's a lot of config that is not yet documented here.  If you get stuck, ask on the ``#dueling-zero-dev` on the ``#tri-zero` channel on the DoomCube Discord.  But this can be fun, too.
+
+The docs are currently just about the bare minimum; they certainly will get more prescriptive and complete over time, especially if you share your build on the Voron Forum or ``#dueling-zero-dev` thread on the `#tri-zero` channel on the DoomCube Discord.  
+
+For example, if you're reading this... you should get your entire printer working first without the custom branch, with a successful single-extruder print.  THEN proceed to make the two work together.
 
 **Configuration:**
 
-To use Dual Gantry support, the minimal Klipper configuration must:
+To use Dual Gantry support from the branch above, the minimal Klipper configuration must:
 * Add [stepper_u] and [stepper_v] sections for the second gantry, along with corresponding stepper-driver sections
 * Specify `kinematics: dualgantry_corexy` in the printer section
 * Define T0 and T1 macros with SET_DUAL_CARRIAGE inside
 
-A sample file to configure a full printer with 2x SKR Pico boards and 2x CAN toolhead boards is avaliable in [link TBD]().
+You'll have to modify an existing sample config.
 
 However, all kinds of other stuff must evolve when going from one to two extruders.  `PRINT_START`, `CANCEL`, even `HOME`, are all are macros that really need dual-extruder awareness to prevent collisions in all cases.  Take a look at these.
 
