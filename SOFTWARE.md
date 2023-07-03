@@ -184,9 +184,13 @@ Klipper supports a massive ecosystem of control boards, sees new features added 
 
 As of 2022-08-18, however, Klipper mainline does not *directly* support a Dual Gantry printer.
 
-No problem.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), there is a single patch for this.
+No problem.  Thanks to a collaboration between Zruncho and Tircown (a developer of the highly-related Klipper IDEX code), there is a GitHub branch with the code required:
 
-GO HERE.
+* [GitHub Klipper fork with Dual Gantry additions](https://github.com/zruncho3d/klipper/tree/dual_gantry_main)
+
+You'll have to change your local Klipper code to use the dual_gantry_main branch, plus you'll nhave to restart Klipper so that the new code takes effect.  
+
+Since the changes live entirely within a single file (`klippy/kinematics/dualgantry_corexy.py`), there's a good chance that if you rebase this code to the latest Klipper, it will "just work".  The chances of getting all this stuff merged are slim-to-none at the moment, given that Kevin (the main Klipper dev's) has a high bar for Klipper additions, ideally having value to many people, and there aren't many Dueling Zeros.  There's a chicken-and-egg situtation here, but it's resolved when enough people have these, share them, and show the code running.
 
 **Configuration:**
 

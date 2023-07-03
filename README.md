@@ -10,6 +10,8 @@ Mod a [Voron Zero](https://vorondesign.com/voron0.1) or build one fresh!
 
 It's real, and it prints.
 
+As of July 2023, there are at least 5 built or mostly-built examples, with active development.
+
 # [> > > Watch Video from first prints](https://youtu.be/2YI3_g30EwA)
 
 [![alt_text](Images/first_print_thumbnail.png)](https://youtu.be/2YI3_g30EwA)
@@ -31,6 +33,13 @@ Renders:
 | - | - | - |
 
 ## Release History
+
+### 2023-07-03: a little update: interest is growing!
+In mid-2023 the interest has been picking up, as more people learn about the printer.  Community development includes [Desune's Dueling Boops variant](https://github.com/desune2487/Dueling_Boops), Chadonka's gantry board mounts, and more stuff that should be released shortly.
+
+Zruncho's back on it, too.  Tri-Zero spinoffs, like [ZeroPanels v3](https://www.youtube.com/watch?v=6F5wUP4zZDg), have been tested first on Dueling Zero.  Watch this space carefully for major updates to documentation and design...
+
+Also: Klipper code is more easily found [here](https://github.com/zruncho3d/klipper/tree/dual_gantry_main) now, as well as on the SOFTWARE page here.
 
 ### 2022-08-20: Alpha-1  
 This first release covers everything you need to build and run your own Dueling Zero: CAD, STLs, DXFs, sample firmware configs, smart avoidance code, G-code streaming code, instructions, and a parts list... everything but an illustrated manual.  But if you're reading this, you almost certainly don't need a manual, anyway.
@@ -237,4 +246,8 @@ Please raise an issue for this repo to update the list of links if you come acro
 
 ## Support
 
-There's a [Reddit thread](https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/) on `r/VoronDesign` for any comments or questions.
+The best place to ask questions and see the latest is on the DoomCube Discord, where many Printers For Ants builders hang out.  Go to the ``#dueling-zero-dev` thread in the #tri-zero channel.  Put your build log in the `#build_logs` showcase forum there too!
+
+There's also a [Reddit thread](https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/) on `r/VoronDesign` for any comments or questions.
+
+
