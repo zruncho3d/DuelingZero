@@ -8,8 +8,8 @@ Mod a [Voron Zero](https://vorondesign.com/voron0.2) or build one fresh!
 
 **D0** is the only open-source, fully-documented, reproducible-by-anyone Dual Gantry printer out there.
 
-| ![alt_text](Renders/Printer/top-3.png) | ![alt_text](Renders/Printer/iso-perspective.png) |
-| - | - |
+| ![alt_text](Renders/Printer/top-3.png) | ![alt_text](Renders/Printer/iso-perspective.png) | ![](Images/v3/cat_small.jpg)
+| - | - | - |
 
 Curious?  Watch it print below!
 
@@ -37,12 +37,21 @@ Here's the side-by-side comparison from above, with v1 on left, and new v3 on ri
 | ![alt_text](Archived_v1/Renders/top-2.png) | ![alt_text](Renders/Printer/top-3.png) |
 | - | - |
 
-The printer looks a little different now, especially with internal spool holders!
+Or, in reality:
+
+| ![alt_text](Images/v3/v1_iso.jpg) | ![alt_text](Images/v3/v3_iso.jpg) |
+| - | - |
+
+The printer looks a little different now, with internal spool holders!
 
 | ![alt_text](Renders/Printer/iso-perspective.png) | ![alt_text](Renders/Printer/front-ortho.png) | ![alt_text](Renders/Printer/side-ortho.png) |
 | - | - | - |
 
-In short - it's a big deal of an update.  This is what D0 should have always been, but sometimes it's only through iteration and collaboration that you get to what feels right.  **The v3 gantry feels right**.  No weird strut, smaller, more maintainable... all-around, better.
+In short - **this is a big update**.  *This is what D0 should have always been.*
+
+Sometimes it's only through iteration and collaboration that you get to what feels right.  **The v3 gantry feels right**.  
+
+No weird strut, no flipped motors, smaller, more maintainable... all-around, better.
 
 The gantry improvements are summarized below:
 
@@ -52,7 +61,7 @@ Other major improvements to call out:
 
 * **Boop support by default**: for perfect first layers every time, nozzle probing with [Boop](https://github.com/PrintersForAnts/Boop) is now the default.  There are no magnets to get loose in a heated chamber and no probe motions to configure anymore.
 * **Voron 0.2-compatible toolheads now fit**, including the Voron Mini Stealthburner toolhead, shown in these renders.
-* **Gantry board support** for the [GBB15 gantry board](https://github.com/skuep/GBB15) - enables super-clean, easy wiring
+* **Gantry board support** for the [GBB15 gantry board](https://github.com/skuep/GBB15) - enables super-clean, easy wiring with magnetic-attach covers
 * **Dual internal spool holders** added
 
 For previous updates, see the [Updates](updates.md) page.
@@ -68,6 +77,43 @@ There's a ton of detailed content in this repo, beyond this README.
 - #### [Instructions](INSTRUCTIONS.md): Instructions to print, assemble, and configure
 - #### [FAQ](FAQ.md): Common questions, answered
 - #### [Archived v1](Archived-v1/REAMDE-v1.md): Prior design
+
+## Sample Builds
+
+### Zruncho's Red/Black Build
+
+Originally [V0.562](https://www.reddit.com/r/voroncorexy/comments/odfid1/voron_00_serial_request_zruncho1790/), then the first Dueling Zero, and now with the v3 gantry:
+
+| ![alt_text](Images/v3/box_o_parts.jpg) | ![alt_text](Images/v3/top.jpg) | ![](Images/v3/archetype_parts.jpg) |
+| - | - | - |
+
+Highlights of this particular build:
+* XY Motion and Toolhead
+  * [Boop beta-4](https://github.com/PrintersForAnts/Boop/tree/main/beta_4)-based carriages with nozzle bed probing, plus rear threads for toolhead boards
+  * [MiniSB](https://github.com/VoronDesign/Voron-0/tree/Voron0.2r1/STLs/Toolheads/Mini_Stealthburner) toolheads with [Revo Voron](https://e3d-online.com/products/revo-voron) hotends - V0.2r1 version
+* Frame and Z Motion
+  * Rail-less Z motion (!) using printed Tri-Zero MGN7-compatible sliders
+  * [Tri-Zero](https://github.com/zruncho3d/tri-zero) triple-belted Z with tool-less belt attachments
+  * LDO Red 1515 V0 frame kit + MakerBeamXL 1515 pieces cut to size
+  * AC 180x180 [Prusa Mini size plate bed](https://www.aliexpress.com/item/3256803530287164.html) with textured and smooth PEI sheets
+* Electronics
+  * 2x [GBB15](https://github.com/skuep/GBB15) gantry boards
+  * 2x EBB42 toolhead boards
+  * BTT U2C USB CAN board
+  * LRS-150-24 Power Supply
+  * Raspberry Pi 3B
+  * SKR Pico controller boards for Z motion
+  * Mini 12864 display with [Klipper adapter](https://www.aliexpress.com/item/3256802553287831.html)
+  * 2x Fysetc PIS USB ADXL boards mounted to x carriages
+* Other
+  * Panels: [ZeroPanels v3](https://github.com/zruncho3d/ZeroPanels) with optional midclips and rear-hinged top panel
+  * Travel: 166mm x 180mm in XY, ~130mm in Z (not optimized!)
+  * Filament: mix of KVP ABS flavors: Metallic Silver, Black, and Stellar Black.
+  * [PrinterExperiments](https://github.com/zruncho3d/printer-experiments) code for easy Z nozzle alignment with a single command
+
+### Desune's Silver Build
+
+TBA
 
 ## Overview
 
@@ -150,8 +196,8 @@ For the rest of the printer, D0 heavily leverages off-the-shelf parts from these
 * [BoxZero](https://github.com/zruncho3d/BoxZero) ditches the V0 tophat
 * [TriZero](https://github.com/zruncho3d/tri-zero) adds automatic bed leveling and enables XY scalability
 * [ZeroPanels](https://github.com/zruncho3d/ZeroPanels) add snap-in panels
-* [Boop](https://github.com/PrintersForAnts/Boop) add highly accurate nozzle probing
-* [Voron V0.2](https://vorondesign.com/voron0.2) provides the default toolhead
+* [Boop](https://github.com/PrintersForAnts/Boop) adds highly accurate nozzle probing
+* [Voron V0.2](https://vorondesign.com/voron0.2) provides a good toolhead default
 
 If you're not familiar with these mods, here's a pic, showing a Plus50-size Tri-Zero + BoxZero printer (170x170 bed motion), next to a V0-size (120x120 bed motion) Tri-Zero + BoxZero.  Both have ZeroPanels.
 
@@ -206,7 +252,7 @@ Please raise an issue for this repo to update the list of links if you come acro
 
 ## Credits
 
-* **Desune**: designed Dueling Boops and co-designed the v3 gantry w/Zruncho.
+* **Desune**: designed Dueling Boops (the honorary v2 gantry) and co-designed the v3 gantry w/Zruncho.
 * **MasturMynd**: designed Pandora, which made this possible.
 * **Tircown**: made a single-Klipper-instance version possible, with his code and live debugging
 * **Reviewers (for v1): Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.

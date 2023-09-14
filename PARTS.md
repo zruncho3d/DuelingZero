@@ -1,65 +1,50 @@
 ## Parts List
 
-In general, none of the parts here should be a surprise.
+In general, none of the parts here should be a surprise.  Beyond anything D0-specific, you'll need everything to build at least one V0, likely a Tri-Zero, but also everything for the Boops and extra toolhead.
 
-Yes, extrusions will get longer, X rails are longer, and you’ll need longer belts.  You’ll want longer Y rails if doing T0+.
+#### Rails
 
-In fact, it may be cheaper to just buy two V0 kits and supplement with a few parts.  You'll want:
+| Part | Qty | Qty | Notes |
+| - | - | - | - |
+| X rails | [300mm MGN7H](https://www.aliexpress.com/item/2251832694486732.html?) | 2x | Make sure to also buy a ‘Carriage Only’ part and message the seller to add it to the rail before they ship it. |
+| Y rails | [240mm MGN9H rails](https://www.aliexpress.com/item/2251832586981749.htm) | 2x | Make sure to order high (Z1) preload |
+| Z rails | 200mm-220mm MGN7H | 4x | |
 
-* 2x [250mm MGN7H rails](https://www.aliexpress.com/item/2251832694486732.html?)
-  * Make sure to also buy a ‘Carriage Only’ part and message the seller to add it to the rail before they ship it.
-* [2x 200mm MGN9C rails](https://www.aliexpress.com/item/2251832586981749.htm)
-* 20mm set screws are recommended to double up extrusions, just like noted on the BoxZero GitHub.
+#### Extrusions
+
+The recommended frame size enables a full 180x180x180 build volume, with a bit of extra travel in the rear Y area for a nozzle endstop, nozzle brush, and maybe a camera for alignment.  Yes, you can build a smaller test bed build, but the travel won't be practical.  
+
+You can start from a V0 kit and end-join (BoxZero-style) the chunks, as well as use 1515 supplements cut to length to get a choice of color.  If the size is close for the verticals, you can bridge the gap slightly with BoxZero corners (e.g., 400 + 50 -> 450 with B0 corners).
+
+For larger sizes than 180x180 in XY, larger extrusions are recommended.
+
+1515 extrusions:
+
+| Part | Qty | Dimensions | Notes |
+| - | - | - | - |
+| frame/gantry/bedframe/rear-brace x-dir | 8 | 350mm |
+| frame Y-dir | 4 | 260mm |
+| frame Z-dir | 4 | 450mm |
+| gantry fixed small Y-dir | 2 | 160mm |
+| bedframe Y-dir | 1 | 160mm |
+| gantry moving Y-dir | 2 | 250mm |
+
+These parts should yield travel of approximately 188 x 194 x 180 in XYZ.
+
+#### Panels
 
 The bottom baseplate has a custom size, but all other panels are simple rectangles.
 
-| Part | Qty | Dimensions |
-| - | - | - |
-| Baseplate | 1x | 339 mm x 259 mm (with cutouts)
-| Front/Back | 2x | 339 mm x 409 mm
-| Sides | 2x | 259 mm x 409 mm
-| Top | 1x | 339 mm x 259 mm
+12mm extra space added to the external extrusion size will fit ZeroPanels v3 parts exactly.
 
-With a 25% discount, a SendCutSend order came to ~$100 including all panels,
-while a Tap Plastics order came to $50 before shipping, but without the baseplate.
+Note that the baseplate is different, because it fits within extrusions.
 
-Order Samples:
-
-![](Images/orders/scs_order.png)
-
-![](Images/orders/tap_order.png)
-
-#### Size: {Small, Stock, Larger}
-
-You don’t have to build it at the default CAD size (~170 x ~170 travel), but that feels like a sweet spot.  Here's why:
-
-* You *can* go smaller with the build - say 300mm fronts, 200mm sides, stock V0 bed - but the toolhead overlap will make the need for endzone dances higher, when printing on the full area.
-* Subjectively, the stock larger CAD size feels reasonably rigid, even without rigid panels adding any stiffness.
-  * The BoxZero corners add a noticeable amount of stiffness, and the multiple attachment points on the gantry shorten the effective span length of the vertical extrusions.
-  * A single rigidly-mounted rear panel should do wonders here, too.
-* Anything larger than the default size may need added rigidity.  Maybe you could do a 200x200 bed with 1515… but at that point, 2020 extrusions should be a consideration.
-  * On the plus side, Tiny-M provides a roadmap to doing such a 2020 conversion, and when combined with a Tri-Zero port like Ankurv’s one… the work might not be too bad.
-
-For the stock size, you can use the extrusions in a V0 kit, supplemented with:
-
-* 10x 50mm extrusion chunks in the Y dir: most are for the sides and gantry crossbars; plus, one for the bedframe and one for the strut
-* 5x 300mm extrusions in the rear: 4 for the box plus for the bedframe crossbar
-* 6x 200mm extrusions on the base sides as well as rear verticals
-* 1x 100mm extrusion for the bedframe
-
-As a bonus, most holes in the V0 kit can be reused, if you put the right parts in the right places, in advance: mostly for verticals, which need blinds joints all around.
-
-This pic doesn’t show the 50mm chunks accurately, but the rest is accurate.  Add flashes of color where you want, and make it your own.
-
-TBD: Add frame pic
-
-You can buy 200s and join them to 100s to save a little money too.
-
-I keep one 100mm extrusion as a souvenir from each V0, but also to test sliders, which need to be matched to the particular extrusion type, and even batch.
-
-Running out of colors from all the V0 builds...
-
-![](Images/random/souvenirs.jpeg)
+| Part | Qty | Dimensions | Material |
+| - | - | - | - |
+| Baseplate | 1x | 359 mm x 269 mm (with cutouts - TBA to repo!) | 3mm ABS or ACM |
+| Front/Back | 2x | 362 mm x 432 mm | 3mm Acrylic in front; acrylic or ABS/ACM in back |
+| Sides | 2x | 282 mm x 443 mm | 3mm Acrylic |
+| Top | 1x | 362 mm x 282 mm | 3mm Acrylic |
 
 #### Triple-Z vs Single-Z
 
@@ -69,6 +54,8 @@ If you’re not a fan of cantilevers (Zruncho's hand just raised, too...), and y
 
 #### Control Boards
 
-The control board situation is up to you.  In theory, any boards should be fine, as long as you get enough steppers.  I've tried out a Duet2 Wifi for XY testing and have used a dual SKR Pico setup, which is extremely compact.  Both setups have sample code in the repo.
+The control board situation is up to you.  In theory, any boards should be fine, as long as you get enough steppers.  
 
-CAN toolhead boards are highly recommended, as they reduce your wiring, and enable the use of stock 8-driver boards.
+Gantry boards (GBB15) are highly recommended, as they enable a single cable per side, as well as easier toolhead-cable plug/unplug.
+
+CAN toolhead boards are highly recommended, as they reduce your wiring and enable a smaller main control board.
