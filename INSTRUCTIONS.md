@@ -12,6 +12,15 @@ BoxZero corners will need a lower layer height (0.16 mm) and/or wider extrusion 
 
 A distinct color per gantry and per toolhead really does help keep things sane!  It's easy to get turned around when the gantry is upside-down, and when each gantry itself is flipped from the usual V0 orientation.
 
+NOTE: quantities (e.g., "_x2") are for the whole printer.  So if you have two distinct-color gantries, do half of the totals for each even-quantity part with each color.  
+
+NOTE: sSome files are missing here currently, which will be needed to match the default size: specifically:
+* longer front and side skirt parts
+* wider side fans
+* baseplate dxf
+
+The good news - the gantry parts are all scalable! You can start on the gantry if you want.
+
 ## Assembly Instructions
 
 In general, the CAD should be your primary reference.  Don’t expect 100% of all screws and nuts to be present in CAD, though... the model is already big enough, and I've left out some bits that should be obvious.
@@ -25,18 +34,18 @@ In general, the CAD should be your primary reference.  Don’t expect 100% of al
 * Drill new holes for blind joints, using the V0 drill guide.
   * 8 holes in the back 400mm verticals at ends
   * 4 repositioned gantry blind access holes in the 300mm.  Use the 15mm corner cubes for these to get the right position with the drill guide.
-* Print out a small army’s worth of no-drop nuts [NDN](https://github.com/zruncho3d/f-zero/tree/main/STLs/NoDropNuts)s.  Size these to your extrusions.  If using a mix of LDO + MBXL, keep them apart, as the sizes will be different.  You don’t want to have to pause the build for these, or hold off on adding them everywhere because you’re running low.
+* Print out a small army’s worth of no-drop nuts ([NDN](https://github.com/zruncho3d/f-zero/tree/main/STLs/NoDropNuts)s).  Size these to your extrusions.  If using a mix of LDO + MBXL, keep them apart, as the sizes will be different.  You don’t want to have to pause the build for these, or hold off on adding them everywhere because you’re running low.
 * Print out extra cable channels and Wago mounts.
 
 #### Build
 
 It’s a cake with layers.  You make the layers independently.
 
-![](Images/build/layers.jpeg)
+![](Archived_v1/Images/build/layers.jpeg)
 
 Then you join them.
 
-You don’t need to follow the order below, but it’s known to work.  In all steps, make sure to add more NDNs that you think might need!  You’ll need a lot, especially as all corners add 4-6 NDs.
+You don’t need to follow the order below, but it’s known to work.  In all steps, make sure to add more NDNs that you think might need!  You’ll need a lot, especially as all corners add 4-6 NDNs.
 
 In all steps, get screws finger tight, but wait until the printer includes all parts to fully tighten all (accessible) screws.
 
