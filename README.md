@@ -255,6 +255,8 @@ Please raise an issue for this repo to update the list of links if you come acro
 * **Desune**: designed Dueling Boops (the honorary v2 gantry) and co-designed the v3 gantry w/Zruncho.
 * **MasturMynd**: designed Pandora, which made this possible.
 * **Tircown**: made a single-Klipper-instance version possible, with his code and live debugging
+* **Clee**: saved the project with some hardcore hardware rescue with the STM GB01 chips
+* **ToxGunn**: diagnosed a stepper overcurrent issue and saved me more plastic and motors
 * **Reviewers (for v1): Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.
 * **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
 * **Nemgrea**: none of this would have happened without a solid base.
