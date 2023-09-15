@@ -71,7 +71,7 @@ For previous updates, see the [Updates](updates.md) page.
 There's a ton of detailed content in this repo, beyond this README.
 
 - #### [Overview](#overview): Why Dual Gantry?
-- #### [Updates](#updates): Major Release Updates
+- #### [Updates](UPDATES.md): Major Release Updates
 - #### [Software](SOFTWARE.md): Two toolheads in one workspace, explained
 - #### [Parts](PARTS.md): Parts list to build your own
 - #### [Instructions](INSTRUCTIONS.md): Instructions to print, assemble, and configure
