@@ -89,20 +89,23 @@ Originally [V0.562](https://www.reddit.com/r/voroncorexy/comments/odfid1/voron_0
 
 Highlights of this particular build:
 * XY Motion and Toolhead
-  * [Boop beta-4](https://github.com/PrintersForAnts/Boop/tree/main/beta_4)-based carriages with nozzle bed probing, plus rear threads for toolhead boards
-  * [MiniSB](https://github.com/VoronDesign/Voron-0/tree/Voron0.2r1/STLs/Toolheads/Mini_Stealthburner) toolheads with [Revo Voron](https://e3d-online.com/products/revo-voron) hotends - V0.2r1 version
-* Frame and Z Motion
-  * Rail-less Z motion (!) using printed Tri-Zero MGN7-compatible sliders
+  * 2x [Boop beta-4](https://github.com/PrintersForAnts/Boop/tree/main/beta_4)-based carriages with nozzle bed probing, plus rear threads for toolhead boards, using the same sensor option as Tap
+  * 2x [MiniSB](https://github.com/VoronDesign/Voron-0/tree/Voron0.2r1/STLs/Toolheads/Mini_Stealthburner) toolheads
+  * 2x [Revo Voron](https://e3d-online.com/products/revo-voron) hotends - V0.2r1 version
+  * 4x StepperOnline Nema 14 (14HS20-1504S) stepper motors
+* Frame and Z
+  * Rail-less Z motion (!) using printed Tri-Zero MGN7-compatible sliders with match fit to extrusions
   * [Tri-Zero](https://github.com/zruncho3d/tri-zero) triple-belted Z with tool-less belt attachments
-  * LDO Red 1515 V0 frame kit + MakerBeamXL 1515 pieces cut to size
-  * AC 180x180 [Prusa Mini size plate bed](https://www.aliexpress.com/item/3256803530287164.html) with textured and smooth PEI sheets
+  * 3x Kysan 1124090 NEMA17 motors for Z
+  * LDO 1515 V0 frame kit (Red) + MakerBeamXL 1515 (Black) w/500mm pieces cut to size
+  * 300W AC 180x180 [Prusa Mini size plate bed](https://www.aliexpress.com/item/3256803530287164.html) with textured and smooth PEI sheets
 * Electronics
+  * Raspberry Pi 3B
+  * SKR Pico controller boards for Z motion
   * 2x [GBB15](https://github.com/skuep/GBB15) gantry boards
   * 2x EBB42 toolhead boards
   * BTT U2C USB CAN board
-  * LRS-150-24 Power Supply
-  * Raspberry Pi 3B
-  * SKR Pico controller boards for Z motion
+  * Meanwell LRS-150-24 PSU
   * Mini 12864 display with [Klipper adapter](https://www.aliexpress.com/item/3256802553287831.html)
   * 2x Fysetc PIS USB ADXL boards mounted to x carriages
 * Other
@@ -111,9 +114,42 @@ Highlights of this particular build:
   * Filament: mix of KVP ABS flavors: Metallic Silver, Black, and Stellar Black.
   * [PrinterExperiments](https://github.com/zruncho3d/printer-experiments) code for easy Z nozzle alignment with a single command
 
+This build is a bit too small to cover the full bed and support over-travel in all directions. For all new builds, a build the size of Desune's is recommended; more in the [Parts](PARTS.md) section.
+
 ### Desune's Silver Build
 
-TBA
+Highlights of this particular build:
+
+* XY Motion and Toolheads
+  * 2x Boop beta4 with Optotap v2.4.1 (slightly modified for rear microswitch mounting)
+  * 2x Dragon Burner v7 (modified for Boop clearance)
+  * 2x Rapido v2 HF
+  * 2x Orbiter v2 extruders with filament sensors
+  * 2x MGN7H 300mm
+  * 2x MGN9H 250mm
+  * 4x StepperOnline Nema 14 (14HS20-1504S) stepper motors
+  * 3x Cloudray Nema 17 (17CS04A) stepper motors
+* Frame and Z
+  * Misumi 1515 extrusions (silver)
+  * Rail-less Z motion sliders (modified to fit Misumi extrusions)
+  * Triple-belted Z with custom Pandora'sBox-derived GE5C joints
+  * 180x180 bed with 300W AC powered heater
+* Electronics
+  * BTT Manta M8P v1.1 with CB1 v2.2 compute module
+  * 2x BTT EBB36 v1.2 toolhead boards
+  * 7x BTT TMC2209 stepper drivers
+  * BTT TFT35 SPI v2.1 touchscreen
+  * Meanwell UHP-200 PSU
+  * CG 40A DA SSR
+* Other
+  * ZeroPanels clips (modified for screw mount on Misumi extrusions)
+  * Filament - eSUN ABS silver and black
+  * Removable base panel for easy electronics access.
+  * Outer Dimensions (without enclosure panels):  L: 290  W:380  H:526mm   Height includes electronics compartment and feet.  Vertical extrusions are currently 450mm, however 50~100mm of extra height for umbilical clearance is recommended for maximum Z travel.
+  * Maximum XY travel (approximate):  X:188mm  Y:194mm  (with Dragon Burner toolhead)
+  * Maximum Z travel (as configured with 200mm linear rails): 168mm
+
+The parts for this specific build are available at Desune's [Dueling Boops](https://github.com/desune2487/Dueling_Boops) repo.  They are extremely similar to Zruncho's parallel implementation; the two influenced each other during development.  Definitely take a look, as you can mix and match parts from this one, including the updated skirts and bed pieces.
 
 ## Overview
 
