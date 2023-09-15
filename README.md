@@ -201,7 +201,7 @@ For the rest of the printer, D0 heavily leverages off-the-shelf parts from these
 
 If you're not familiar with these mods, here's a pic, showing a Plus50-size Tri-Zero + BoxZero printer (170x170 bed motion), next to a V0-size (120x120 bed motion) Tri-Zero + BoxZero.  Both have ZeroPanels.
 
-![](Renders/iso-both.png)
+![](Archived_v1/Renders/iso-both.png)
 
 ### Learn more!
 
