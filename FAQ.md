@@ -2,19 +2,25 @@
 
 ### Is it still a Voron Zero?
 
-Hell no...
+With the v1 gantry, the answer was "Hell no":
 
-The only printed parts this printer shares with a regular Voron Zero:
+The only printed parts shared with a regular Voron Zero were:
 * 9mm spacers
 * Pi mount
+
+With the v3 gantry, the answer is "Somewhat".
+
+The only printed parts this printer shares with a regular Voron Zero are:
+* MiniSB toolhed
+* Pi mount
+
+But really...
 
 **Hell yes!**
 
 Because it wouldn't exist without the V0.  
 
-Because many parts are modifications of existing V0 parts.
-
-Because nearly every non-printed part, including the frame, is a stock V0-BOM part.
+Because many non-printed parts, including the frame, rails, and motors are identical, or at least similar.
 
 So there you go... a V0 in DNA, if not in printed parts.
 
@@ -46,29 +52,29 @@ Add some money for a new, larger bed, too.
 
 And the extra extrusions, too.
 
-But having your very own Dual Gantry CoreXY printer - possibly the second in the world: **priceless**.
+But having your very own Dual Gantry CoreXY printer - possibly the second in the world to print with two extruders in the same part: **priceless**.
 
 ### How much XY travel do I get?
 
-There’s an aspirational goal to get ~170x170 motion for a 180x180 bed using the corner-cube-extended 300mm front/rear horizontals and 250mm side horizontals.
+With the new v3 frame size, assuming Boops are used, beyond 180x180 is possible: 184 x 194 travel.
 
-Final numbers are TBD, but currently come close to this goal:
-* ~165mm usable Y travel covering 160mm bed, where the remaining 5mm is due to a wire interference
-* ~155mm usable X travel, where the remaining travel might come from updated toolhead-board mounts and wire routing
+A shorter-depth moving carriage option, like the Micron or Pandora X carriage options, would add ~8mm to each side, but would require a mount to be added for something like a Klicky.
 
-### Can I port this to a V2-style CoreXZ gantry?
+### Can I port this to a V2-style CoreXY gantry?
 
 Good question!
 
-Part of what makes the design possible is that the Y rails on a V0-style gantry face inwards, vs upwards or downwards.  This makes them suitable for a symmetric design that places one gantry above and one below.  
+Yes, though you would lose some of the XY density, if running belts just inside of the extrusions, rather than atop the extrusions, Pandora-style.
 
-For a V2/Trident-style gantry, you’d have to modify the XY joints to support 4 stacked belts, which might become an issue as those belts get farther away from the carriages and as that higher distance creates higher torques on the carriages.  Or, you’d need to use 4 total single-carriage rails and align them carefully, which seems a bit risky.
+However... maybe you won't need to.
 
-Porting to a Switchwire-style CoreXZ gantry would seem to have similar considerations.
+The v3 Fusion360 CAD is heavily parametric.  Pages of parameters!  In early design, a range of parameters were actively tested, including everything needed for a V2 gantry: extrusion size, bearing size, and belt spacing.
+
+But as of 2023-09-15, some issue with the base sketch is causing computation errors.  These are hard to debug and fix.  Stay tuned here.
 
 ### Why not just do an IDEX?
 
-**Answering as a user**: because single-extruder prints can be faster and better without a second toolhead to drag around, and there are some unique capabilities (simultaneous different prints, full-workspace single prints) that you get with a Dual Gantry but not an IDEX.
+**Answering as a user**: because single-extruder prints can be faster and better without a second toolhead to drag around, and there are some unique capabilities (simultaneous different prints, full-workspace single prints) that become possible with a Dual Gantry.
 
 **Answering as a printer-designer**: it’s a unique and interesting challenge to fit all the belts and toolheads into one gantry, especially in a way that reuses much of what’s out there.  Lots of people have described the main concept, including many years ago, but few have made it to CAD, let alone a functioning printer, let alone one that others can reproduce from a link.
 
