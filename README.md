@@ -64,6 +64,8 @@ Other major improvements to call out:
 * **Gantry board support** for the [GBB15 gantry board](https://github.com/skuep/GBB15) - enables super-clean, easy wiring with magnetic-attach covers
 * **Dual internal spool holders** added
 
+**Existing v1 builders**: to upgrade, the main costs will be new rails, a few new extrusions, and Boop parts.  There's nothing wrong with such a build.  If you're partway there and want to make the transition, Zruncho recommends finishing just the low-side V1 gantry and getting everything operational, then using that printer to print all parts for a single-toolhead v3 gantry, testing it outside of the printer, and then transitioning to it once the new gantry is validated (in a day). If you want full bed over-travel, though, a fresh rebuild with the larger frame makes sense.
+
 For previous updates, see the [Updates](updates.md) page.
 
 ## Table of Contents
@@ -79,6 +81,10 @@ There's a ton of detailed content in this repo, beyond this README.
 - #### [Archived v1](Archived-v1/REAMDE-v1.md): Prior design
 
 ## Sample Builds
+
+Let's be honest here... there's no such thing as a completely "stock" D0 build.  If you can build this, you're going to pick the best parts for you, and the beauty of living within the V0/T0/Boop ecoystem - more than ever with the v3 gantry - is that you *get* this choice.
+
+Two sample builds below should get you thinking.  Make sure to check out `Hex-Zero` mod by Alexander Þór and HBO's [T0 mods repo](https://github.com/harry-boe/tri-zero/tree/main/Mods/hbo) for alternate skirts and the Z joints, in particular, as well as Desune's [Dueling Boops](https://github.com/desune2487/Dueling_Boops) repo for alternate skirts and gantry parts, as well as skim through `#dueling-zero-dev` on DoomCube for the latest.
 
 ### Zruncho's Red/Black Build
 
@@ -121,7 +127,7 @@ This build is a bit too small to cover the full bed and support over-travel in a
 Highlights of this particular build:
 
 * XY Motion and Toolheads
-  * 2x Boop beta4 with Optotap v2.4.1 (slightly modified for rear microswitch mounting)
+  * 2x Boop beta4 with OptoTap v2.4.1 board (slightly modified for rear microswitch mounting)
   * 2x Dragon Burner v7 (modified for Boop clearance)
   * 2x Rapido v2 HF
   * 2x Orbiter v2 extruders with filament sensors
