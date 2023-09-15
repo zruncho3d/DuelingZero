@@ -23,6 +23,8 @@ A distinct color per gantry and per toolhead really does help keep things sane! 
 * wider side fans
 * baseplate dxf
 
+**NOTE**: All STLs are oriented with the least-visible seam in the back, and with the correct bed-plate orientation.  For most parts - ABs and XYs - you can hide the seam where an extrusion will block its view.
+
 The good news - the gantry parts are all scalable! You can start on the gantry if you want.
 
 ## Assembly Instructions
