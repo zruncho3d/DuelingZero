@@ -11,14 +11,34 @@ Mod a [Voron Zero](https://vorondesign.com/voron0.2) or build one fresh!
 | ![alt_text](Renders/Printer/top-3.png) | ![alt_text](Renders/Printer/iso-perspective.png) | ![](Images/v3/cat_small.jpg)
 | - | - | - |
 
-Curious?  Watch it print below!
+In a Dual Gantry printer, the two heads are *fully* independent.  With **no extra weight** to drag around (vs an IDEX printer), and **no complexity added** to switch between heads (vs a toolchanger), Dual Gantry is a promising way to do more with a 3D printer.
+
+Curious?  Watch the first one print below!
 
 # [> > > Watch Video from first prints](https://youtu.be/2YI3_g30EwA)
 
 [![alt_text](Images/first_print_thumbnail.png)](https://youtu.be/2YI3_g30EwA)
 (original v1 gantry shown)
 
-## Release History
+## What's Here?
+
+Tons of content.  On this page:
+
+- #### [Releases](#releases): Visual release notes
+- #### [Overview](#overview): Why Dual Gantry?
+- #### [Sample Builds](#samplebuilds): Parts and sizes
+- #### [Links](#links), [Credits](#credits), and [Support](#support)
+
+... and beyond, split into their own pages:
+- #### [Parts](PARTS.md): Parts list to build your own
+- #### [Instructions](INSTRUCTIONS.md): Instructions to print, assemble, and configure
+- #### [Software](SOFTWARE.md): Two toolheads in one workspace, explained
+- #### [FAQ](FAQ.md): Common questions, answered
+- #### [Archived v1](Archived-v1/REAMDE-v1.md): Prior design
+
+**Enjoy!** I hope this project inspires you to build something new, whether a D0 or your own design.  -Z
+
+## Releases
 
 **2023-09-16 v3 Gantry release and updates**
 
@@ -27,7 +47,7 @@ This release moves to a completely-new, symmetric, nested belt path:
 | ![alt_text](Renders/Gantry/belts_detail.png) | ![alt_text](Renders/Gantry/belts_detail_iso.png) | ![alt_text](Renders/Gantry/belts_colorized.png) |
 | - | - | - |
 
-This new [Pandora's Box](https://github.com/MasturMynd/Pandoras_Box/tree/main)-derived gantry design, created in close collaboration with `Desune` on Discord, has far fewer unique parts (for better portability to other sizes) and adds travel.
+The new [Pandora's Box](https://github.com/MasturMynd/Pandoras_Box/tree/main)-derived gantry design, created in close collaboration with `Desune` on Discord, has far fewer unique parts, adds travel, and enables wider toolhead compatibility.
 
 | ![alt_text](Renders/Gantry/latest_over_the_top_blur_40_022.png) | ![alt_text](Renders/Gantry/bottom_with_wires.png) | ![alt_text](Renders/Gantry/top_with_wires.png) |
 | - | - | - |
@@ -49,42 +69,94 @@ The printer looks a little different now, with internal spool holders!
 
 In short - **this is a big update**.  *This is what D0 should have always been.*
 
-Sometimes it's only through iteration and collaboration that you get to what feels right.  **The v3 gantry feels right**.  
+Sometimes it's only through iteration and collaboration that you get to what feels right.  **The v3 gantry feels right**. No weird strut, no flipped motors, smaller, more maintainable... all-around, better.  See the comparison table on the [Design](DESIGN.md) page for more details on why.
 
-No weird strut, no flipped motors, smaller, more maintainable... all-around, better.
+Other improvements:
+* **Boop support** for perfect first layers every time, nozzle probing with [Boop](https://github.com/PrintersForAnts/Boop) is now the default.  There are no magnets to get loose in a heated chamber and no probe motions to configure anymore.
+* **Better toolhead compatibility**, including a Voron 0.2-compatible mount for the Voron Mini Stealthburner toolhead and many others.
+* **Gantry board support** for the [GBB15 gantry board](https://github.com/skuep/GBB15) - enables super-clean, easy wiring with magnetic-attach covers.
+* **Dual internal spool holders** added, reducing the effective width.
 
-The gantry improvements are summarized below:
+**Existing v1 builders**: to upgrade, the main costs will be new rails, a few new extrusions, and Boop parts.  There's nothing wrong with your v1 build; it will print fine.  But  if you want more travel and the benefits of Boop, a fresh rebuild with the new larger default frame size might make sense.
 
-![](Diagrams/comparison.png)
+**For earlier releases**, see the [Updates](updates.md) page.
 
-Other major improvements to call out:
+## Overview
 
-* **Boop support by default**: for perfect first layers every time, nozzle probing with [Boop](https://github.com/PrintersForAnts/Boop) is now the default.  There are no magnets to get loose in a heated chamber and no probe motions to configure anymore.
-* **Voron 0.2-compatible toolheads now fit**, including the Voron Mini Stealthburner toolhead, shown in these renders.
-* **Gantry board support** for the [GBB15 gantry board](https://github.com/skuep/GBB15) - enables super-clean, easy wiring with magnetic-attach covers
-* **Dual internal spool holders** added
+### What’s a Dual Gantry printer?
 
-**Existing v1 builders**: to upgrade, the main costs will be new rails, a few new extrusions, and Boop parts.  There's nothing wrong with such a build.  If you're partway there and want to make the transition, Zruncho recommends finishing just the low-side V1 gantry and getting everything operational, then using that printer to print all parts for a single-toolhead v3 gantry, testing it outside of the printer, and then transitioning to it once the new gantry is validated (in a day). If you want full bed over-travel, though, a fresh rebuild with the larger frame makes sense.
+**Dual Gantry** is a rare 3D printer type with two toolheads moved by **two** *completely independent* XY motion systems:
 
-For previous updates, see the [Updates](updates.md) page.
+ ![alt_text](Renders/Printer/top-3.png)
 
-## Table of Contents
+Yes, you’re seeing double, with black and silver toolheads in a dual-CoreXY motion configuration.
 
-There's a ton of detailed content in this repo, beyond this README.
+### Why a Dual Gantry printer?
 
-- #### [Overview](#overview): Why Dual Gantry?
-- #### [Updates](UPDATES.md): Major Release Updates
-- #### [Software](SOFTWARE.md): Two toolheads in one workspace, explained
-- #### [Parts](PARTS.md): Parts list to build your own
-- #### [Instructions](INSTRUCTIONS.md): Instructions to print, assemble, and configure
-- #### [FAQ](FAQ.md): Common questions, answered
-- #### [Archived v1](Archived-v1/REAMDE-v1.md): Prior design
+In general, a second hotend adds enormous flexibility - to support two colors, two materials (typically support + main), and two nozzle sizes, in one print, with no color-bleed issues, cross-contamination, or wasteful purging.  Sounds good, right!
+
+Well, that second hotend, if mounted on a single toolhead, can get in the way of print quality, as it drools filament when not in use - and the toolhead is now custom. :frowning:
+
+So along comes IDEX, short for Independent Dual Extrusion, which adds a second, independent toolhead on a shared axis (typically the X axis).  Sounds better, right?
+
+No drool, plus something cooler: one printer can now print two identical parts simultaneously, in mirror or duplicate modes. :muscle:  (note: in theory; depends on firmware support)
+
+Open-source IDEX designs include [Voron](https://vorondesign.com/)-derived ones, like [Zruncho](https://github.com/zruncho3d)’s [Double Dragon](https://github.com/zruncho3d/double-dragon), [Eddietheengineer](https://www.youtube.com/eddietheengineer)'s [Tridex](https://github.com/FrankenVoron/Tridex/), and [Ankurv](https://github.com/ankurv2k6)’s [IDEX Switchwire](https://github.com/ankurv2k6/voron_idex_switchwire).  There's also the [Muldex](https://github.com/3dprintingworld/MULDEX), and there's no shortage of commercial examples, too: [Sovol SV04](https://sovol3d.com/products/sv04), [FlashForge Creator Pro](https://www.flashforge.com/product-detail/flashforge-creator-pro-2-3d-printer), [BCN Sigma](https://www.bcn3d.com/bcn3d-sigma-d25/), [Jadelabo J1](https://www.jadelabo.com/), and many more.
+
+But that second toolhead comes at a cost: moving mass, which has effects on print speed (max accel) and quality (typically, ringing artifacts).  :neutral_face:
+
+> Simplify, then add lightness - [famous quote from Colin Chapman at Lotus](http://www.lotuscars.com.tr/about-us/lotus-philosophy/index-31332.html#:~:text=At%20the%20root%20of%20our,was%20another%20of%20Chapman's%20premises.)
+
+Whether building a fast race car or a fast printer, physics can't be ignored.  
+
+You can mitigate the moving mass somewhat, by using a lighter toolhead, typically with a remote Bowden extruder, but Bowden extruders introduce their own tuning challenges.
+
+**With Dual Gantry, you get a no-mass-added gantry for the common case of single-extruder prints.**  Unlike an IDEX, here, each toolhead is *truly independent* and can move in X *and* Y on its own - [potentially to print two completely different objects at once!](https://forum.duet3d.com/topic/27895/beta-testers-for-multiple-motion-system-support)
+
+There’s no hit to max acceleration or potential for ringing caused by dragging around a heavy second toolhead on a longer rail all the time.
+
+Sure, you can't print more than two colors, like a multi-material unit or toolchanger can, but everything in engineering is tradeoffs... and Dual Gantry is an interesting and new point in the broader space of 3D printer types that support multiple extrusion:  
+
+![alt_text](Diagrams/landscape_of_multiple_extruders.png)
+
+Take a look at the table above, or at [this other helpful categorization](https://gist.github.com/kmcallister/6636d88802ba00432c65d14e9431c0e6).  This diagram is not comprehensive, but gives a sense for the depth of the design space, and especially, the rarity of everything not on the far left side (typical single-extruder printer).  For some interesting points in the design space, there's only one commercial example!  
+
+(Please file an issue on GitHub if you know of any significant omissions.)
+
+### What’s the catch?
+
+On the plus side, you don't have to design it (anymore).  You don't need to program the firmware either (anymore): Klipper works (thanks to a collaboration with [tircown](https://github.com/tircown)) and RepRapFirmware supports two active gantries, out-of-the-box.  The software base needed to make full use of the workspace, by implementing collision detection and avoidance, is the `src` folder here and explained in the [Software](SOFTWARE.md) section.
+
+On the minus side, building it is roughly twice the work of a typical printer.  There are added costs from the second gantry and toolhead.  There are alignment challenges - including XY and YZ skew calibration - which are currently unknown.  And like any multi-head printer, you'll have more tuning and slicer stuff to figure out.
+
+If all that sounds daunting, this is not the printer for you.  If being the first to figure these out sounds exciting, this may be your next printer!
+
+### How does this mod work?
+
+Roughly... start with a Pandora's Box gantry.  Turn it 90 degrees.  Add extra bearing stacks and combine idlers with AB blocks.  Duplicate it about the center.  Flip it upside-down.  Add off-the-shelf Boop and toolheads.
+
+![alt_text](Renders/Gantry/iso_with_final_wires.png)
+
+That’s the core idea.
+
+In practice, though, there are quite a few additional bits to design to make it work.  And like any V0 mod, the devil is in the packaging details: *every mm matters*.
+
+Beyond the gantry, D0 heavily leverages off-the-shelf parts from these repos:
+* [BoxZero](https://github.com/zruncho3d/BoxZero) ditches the V0 tophat
+* [TriZero](https://github.com/zruncho3d/tri-zero) adds automatic bed leveling and enables XY scalability from a fully-supported bed
+* [ZeroPanels](https://github.com/zruncho3d/ZeroPanels) add snap-in, quick-release panels
+* [Boop](https://github.com/PrintersForAnts/Boop) adds highly accurate nozzle probing
+* [Voron V0.2](https://vorondesign.com/voron0.2) provides a good toolhead default
+
+If you're not familiar with these mods, here's a pic, showing a Plus50-size Tri-Zero + BoxZero printer (170x170 bed motion), next to a V0-size (120x120 bed motion) Tri-Zero + BoxZero.  Both have ZeroPanels.
+
+![](Archived_v1/Renders/iso-both.png)
 
 ## Sample Builds
 
 Let's be honest here... there's no such thing as a completely "stock" D0 build.  If you can build this, you're going to pick the best parts for you, and the beauty of living within the V0/T0/Boop ecoystem - more than ever with the v3 gantry - is that you *get* this choice.
 
-Two sample builds below should get you thinking.  Make sure to check out `Hex-Zero` mod by Alexander Þór and HBO's [T0 mods repo](https://github.com/harry-boe/tri-zero/tree/main/Mods/hbo) for alternate skirts and the Z joints, in particular, as well as Desune's [Dueling Boops](https://github.com/desune2487/Dueling_Boops) repo for alternate skirts and gantry parts, as well as skim through `#dueling-zero-dev` on DoomCube for the latest.
+Two sample builds below should get you thinking.  Make sure to check out `Hex-Zero` mod by Alexander Þór (on the DoomCube Discord) and HBO's [T0 mods repo](https://github.com/harry-boe/tri-zero/tree/main/Mods/hbo) for alternate skirts and the Z joints, in particular.  Also check out Desune's [Dueling Boops](https://github.com/desune2487/Dueling_Boops) repo for alternate skirts and gantry parts.  For the latest, check `#dueling-zero-dev` on the DoomCube discord.
 
 ### Zruncho's Red/Black Build
 
@@ -157,107 +229,19 @@ Highlights of this particular build:
 
 The parts for this specific build are available at Desune's [Dueling Boops](https://github.com/desune2487/Dueling_Boops) repo.  They are extremely similar to Zruncho's parallel implementation; the two influenced each other during development.  Definitely take a look, as you can mix and match parts from this one, including the updated skirts and bed pieces.
 
-## Overview
-
-### What’s a Dual Gantry printer?
-
-**Dual Gantry** is a rare 3D printer type with two toolheads moved by **two** *completely independent* XY motion systems:
-
- ![alt_text](Renders/Printer/top-3.png)
-
-Yes, you’re seeing double, with black and silver toolheads in a dual-CoreXY motion configuration.
-
-### Why a Dual Gantry printer?
-
-In general, a second hotend adds enormous flexibility - to support two colors, two materials (typically support + main), and two nozzle sizes, in one print, with no color-bleed issues, cross-contamination, or wasteful purging.  Sounds good, right!
-
-Well, that second hotend, if mounted on a single toolhead, can get in the way of print quality, as it drools filament when not in use - and the toolhead is now custom. :frowning:
-
-So along comes IDEX, short for Independent Dual Extrusion, which adds a second, independent toolhead on a shared axis (typically the X axis).  Sounds better, right?
-
-No drool, plus something cooler: one printer can now print two identical parts simultaneously, in mirror or duplicate modes. :muscle:  (note: in theory; depends on firmware support)
-
-Open-source IDEX designs include [Voron](https://vorondesign.com/)-derived ones, like [Zruncho](https://github.com/zruncho3d)’s [Double Dragon](https://github.com/zruncho3d/double-dragon), [Eddietheengineer](https://www.youtube.com/eddietheengineer)'s [Tridex](https://github.com/FrankenVoron/Tridex/), and [Ankurv](https://github.com/ankurv2k6)’s [IDEX Switchwire](https://github.com/ankurv2k6/voron_idex_switchwire).  There's also the [Muldex](https://github.com/3dprintingworld/MULDEX), and there's no shortage of commercial examples, too: [Sovol SV04](https://sovol3d.com/products/sv04), [FlashForge Creator Pro](https://www.flashforge.com/product-detail/flashforge-creator-pro-2-3d-printer), [BCN Sigma](https://www.bcn3d.com/bcn3d-sigma-d25/), [Jadelabo J1](https://www.jadelabo.com/), and many more.
-
-But that second toolhead comes at a cost: moving mass, which has effects on print speed (max accel) and quality (typically, ringing artifacts).  :neutral_face:
-
-> Simplify, then add lightness - [famous quote from Colin Chapman at Lotus](http://www.lotuscars.com.tr/about-us/lotus-philosophy/index-31332.html#:~:text=At%20the%20root%20of%20our,was%20another%20of%20Chapman's%20premises.)
-
-Whether building a fast race car or a fast printer, physics can't be ignored.  
-
-You can mitigate the moving mass somewhat, by using a lighter toolhead, typically with a remote Bowden extruder, but Bowden extruders introduce their own tuning challenges.
-
-**With Dual Gantry, you get a no-mass-added gantry for the common case of single-extruder prints.**  Unlike an IDEX, here, each toolhead is *truly independent* and can move in X *and* Y on its own - [potentially to print two completely different objects at once!](https://forum.duet3d.com/topic/27895/beta-testers-for-multiple-motion-system-support)
-
-There’s no hit to max acceleration or potential for ringing caused by dragging around a heavy second toolhead on a longer rail all the time.
-
-Sure, you can't print more than two colors, like a multi-material unit or toolchanger can, but everything in engineering is tradeoffs.  [As Nero says](https://youtube.com/clip/UgkxAxd22dVnUN7P749WHRpp-yFLg3WqvwTv):
-
-> Multimaterial... sucks.  OK?  There’s no way to do it right.  So either you spend money, time, or waste.  No matter what you do, you're gonna be dealing with that.
-
-Dual Gantry is in an interesting point in a larger space.  **Medium money, medium time, minimal waste**.  It fits within a broader space of 3D printer types that support multiple-extrusion, where the number of toolheads, hotends, and extruders varies:
-
-![alt_text](Diagrams/landscape_of_multiple_extruders.png)
-
-Take a look here, or at [this other helpful categorization](https://gist.github.com/kmcallister/6636d88802ba00432c65d14e9431c0e6).  This diagram is not comprehensive, but gives a sense for the depth of the design space, and especially, the rarity of everything not on the far left side (typical single-extruder printer).  For some interesting points in the design space, there's only one commercial example!  
-
-(Please file an issue on GitHub if you know of any significant omissions.)
-
-### What’s the catch?
-
-If it sounds too good to be true... it probably is.  :shrug:
-
-You don't have to design it (anymore), but you still need to build it, which is roughly twice the work of a typical printer.  Plus, compared to a typical single-extrusion, single-toolhead 3D printer, there are added cost, complexity, and alignment challenges.
-
-**The main reason you probably have never seen a Dual Gantry 3D printer: firmware support.**
-
-Support for two gantries with one control board is a good start:
-* RepRapFirmware: supports two active gantries, out-of-the-box.
-* Klipper: thanks to a collaboration with [tircown](https://github.com/tircown), there's a PR available now.
-* Marlin: no.
-
-To get full motion out of a shared-workspace printer, however, you really want active collision detection and avoidance.  
-
-See the [Software](SOFTWARE.md) section for a full explanation, with diagrams, pics, and explanations, as well as code that implements collision detection and avoidance.
-
-### How does this mod work?
-
-Start with a Pandora's Box gantry.  Turn it 90 degrees.  Modify it to add extra bearing stacks and combine idlers with AB blocks.  Duplicate it about the center.
-
-Then when mounting, flip it upside-down.  
-
-Add off-the-shelf Boop and v0.2-compatible toolheads.
-
-![alt_text](Renders/Gantry/iso_with_final_wires.png)
-
-That’s the core idea.
-
-In practice, though, there are quite a few additional bits to design to make it work.  And like with any V0 mod, the devil is in the packaging details: *every mm matters*.
-
-For the rest of the printer, D0 heavily leverages off-the-shelf parts from these repos:
-* [BoxZero](https://github.com/zruncho3d/BoxZero) ditches the V0 tophat
-* [TriZero](https://github.com/zruncho3d/tri-zero) adds automatic bed leveling and enables XY scalability
-* [ZeroPanels](https://github.com/zruncho3d/ZeroPanels) add snap-in panels
-* [Boop](https://github.com/PrintersForAnts/Boop) adds highly accurate nozzle probing
-* [Voron V0.2](https://vorondesign.com/voron0.2) provides a good toolhead default
-
-If you're not familiar with these mods, here's a pic, showing a Plus50-size Tri-Zero + BoxZero printer (170x170 bed motion), next to a V0-size (120x120 bed motion) Tri-Zero + BoxZero.  Both have ZeroPanels.
-
-![](Archived_v1/Renders/iso-both.png)
-
 ### Learn more!
 
 If you've read this far, great, but there's more good stuff.
 
 There's lots more info beyond this README file, in the repo, split into multiple pages.  And the [V1 Archives](Archived_v1/) section provides a view into the original design that you might find interesting.
 
-Take a look around, or up at the Table of Contents above.
+Take a look around, or back to the What's Here section above.
 
 ## Links
 
 ### Dual Gantry
 
-They do exist.  Others have built printers or similar CNC devices with at least two gantries operating in a single shared workspace:
+They do exist!  Others have built printers or similar CNC devices with at least two gantries operating in a single shared workspace:
 
 * [Essentium HSE 280i](https://www.essentium.com/3d-printers/high-speed-extrusion-280/): large, high-dollar, linear-servo printer with two gantries
 * [Cronus](https://www.youtube.com/watch?v=TkEOMQ6rQ6s): a 5-head, single-workspace 3d printer
@@ -299,7 +283,9 @@ Please raise an issue for this repo to update the list of links if you come acro
 * **Tircown**: made a single-Klipper-instance version possible, with his code and live debugging
 * **Clee**: saved the project with some hardcore hardware rescue with the STM GB01 chips
 * **ToxGunn**: diagnosed a stepper overcurrent issue and saved me more plastic and motors
-* **Reviewers (for v1): Red5, _xbst, where’sthelambSAUCE, BeastBc**: thanks for providing feedback that helped make this clear and concise.
+* **Reviewers**: thanks for providing feedback that helped make this clear and concise!
+  * **v3: Caza, Kevinakasam, Tircown, Sanity**
+  * **v1: Red5, _xbst, where’sthelambSAUCE, BeastBc**
 * **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
 * **Nemgrea**: none of this would have happened without a solid base.
 
