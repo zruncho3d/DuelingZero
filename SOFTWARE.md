@@ -192,6 +192,8 @@ You'll have to change your local Klipper code to use the dual_gantry_main branch
 
 Since the changes live entirely within a single file (`klippy/kinematics/dualgantry_corexy.py`), there's a good chance that if you rebase this code to the latest Klipper, it will "just work". There's a chicken-and-egg situtation here toward a mainline release that can only be resolved when enough people have these, share them, and show the code running.  Then it justifies a merge, and it's even easier for the next people to get them.
 
+**NOTE**: If you do not rebase onto the latest Klipper code, you'll be missing out on recent bugfixes and feature additions, plus, your existing toolhead and driver boards may not connect if they have been previously flashed with a more recent version.  You definitely want to rebase this branch onto whatever is the latest code.
+
 **NOTE: HERE BE DRAGONS**.  There's a lot of config that is not yet documented here.  If you get stuck, ask on the ``#dueling-zero-dev` on the ``#tri-zero` channel on the DoomCube Discord.  But this can be fun, too.
 
 The docs are currently just about the bare minimum; they certainly will get more prescriptive and complete over time, especially if you share your build on the Voron Forum or ``#dueling-zero-dev` thread on the `#tri-zero` channel on the DoomCube Discord.  
