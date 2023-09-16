@@ -14,11 +14,11 @@ In general, none of the parts here should be a surprise.  Beyond anything D0-spe
 
 NOTE: the CAD is not the right size.  It's Zruncho's build size.  Which doesn't quite get you a full 180 cube.
 
-The recommended frame size enables a full 180x180x180 build volume, with a bit of extra travel in the rear Y area for a nozzle endstop, nozzle brush, and maybe a camera for alignment.  Yes, you can build a smaller test bed build, but the travel won't be practical.  
+The recommended frame size enables a full 180x180x180 build volume, with a bit of extra travel in the rear Y area for a nozzle endstop, nozzle brush, and maybe a camera for alignment.  Yes, you can build a smaller test bed build, but the travel won't be practical.
 
 You can start from a V0 kit and end-join (BoxZero-style) the chunks ([process described here](https://github.com/zruncho3d/BoxZero#assembly-notes)), as well as use 1515 supplements cut to length to get a choice of color.  If the size is close for the verticals, you can bridge the gap slightly with BoxZero corners (e.g., 400 + 50 -> 450 with B0 corners).
 
-For larger sizes than 180x180 in XY, larger extrusions are recommended.
+For build areas beyond 180x180 in XY, frame stability becomes a question, and girthier-than-1515 extrusions may be needed - or at least, some form of frame bracing.
 
 1515 extrusions:
 
@@ -35,11 +35,13 @@ These parts should yield travel of approximately 188 x 194 x 180 in XYZ.
 
 #### Panels
 
-The bottom baseplate has a custom size, but all other panels are simple rectangles.
+The bottom baseplate has a complex shape, but all other panels are simple rectangles.
 
-12mm extra space added to the external extrusion size will fit ZeroPanels v3 parts exactly.
+The way to think about the sizes is like this:
+* **the baseplate** fits within extrusions, so its size is the inner extrusion size + 4.5mm to fill each extrusion slot - so, inner size + 9mm in total.
+* **the exterior panels** fit on top of the extrusions; foam tape and the panels need to cover the 6mm gap to where ZeroPanels plastic fills the extrusion slot, on both sides.  So: inner size + 12mm.
 
-Note that the baseplate is different, because it fits within extrusions.
+If your panel supplier or extrusion supplier can't guarantee tight tolerances, you may want to drop each size by 1mm to ensure clearance.
 
 | Part | Qty | Dimensions | Material |
 | - | - | - | - |
