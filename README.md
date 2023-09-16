@@ -284,7 +284,7 @@ Please raise an issue for this repo to update the list of links if you come acro
 * **Clee**: saved the project with some hardcore hardware rescue with the STM GB01 chips
 * **ToxGunn**: diagnosed a stepper overcurrent issue and saved me more plastic and motors
 * **Reviewers**: thanks for providing feedback that helped make this clear and concise!
-  * **v3: Caza, Kevinakasam, Tircown, Sanity**
+  * **v3: Caza, Kevinakasam, Tircown, Sanity, Telxoid**
   * **v1: Red5, _xbst, where’sthelambSAUCE, BeastBc**
 * **Clee, Red5, Kyrios, Leopard, EddieTheEngineer, and others**: initial conversations proved motivating - that this wasn’t completely insane.  Thanks!
 * **Nemgrea**: none of this would have happened without a solid base.
