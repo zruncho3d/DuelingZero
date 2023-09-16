@@ -5,7 +5,7 @@ CAD exists to show what’s possible.  NOT to be an exact copy of anything excep
 Parts in this repo are intentionally only the delta from other projects, so that as those projects evolve, you get the latest parts, and there's no copy/paste maintenance overhead.  Life is too short for such toil.
 
 Really, only the gantry and the T0 idler base parts are special here.
-* Standard Voron settings should be fine for all custom D0 parts: 40% infill, 4 perims, 5 top/bottom layers, 0.2mm layer height.  Lower infill is likely fine.
+* Standard Voron settings should be fine for all custom D0 parts: 40% infill, 4 perims, 5 top/bottom layers, 0.2mm layer height.
 
 For other parts, use the settings specified by the respective repo:
 * [BoxZero](https://github.com/zruncho3d/BoxZero)
@@ -25,7 +25,7 @@ A distinct color per gantry and per toolhead really does help keep things sane! 
 
 If you're impatient, a split-move-extrude-join on the part should get you what you need quickly.
 
-**NOTE**: All STLs are oriented with the least-visible seam in the back, and with the correct bed-plate orientation.  For most parts - ABs and XYs - you can hide the seam where an extrusion will block its view.
+**NOTE**: All STLs are oriented with the least-visible seam in the back, and with the correct bed-plate orientation.  For most parts - AB Drive Modules and XY Joints - you can hide the seam where an extrusion will block its view.
 
 The good news - the gantry parts are all scalable! You can start on the gantry if you want.
 
@@ -35,13 +35,8 @@ In general, the CAD should be your primary reference.  Don’t expect 100% of al
 
 ### Prep
 
-* Join extrusions as needed with 20mm set screws, using the BoxZero instructions for this:
-  * 4x 200 + 200
-  * 2x 200 + 100 (front, color-matched)
-  * 10x 200 + 50
-* Drill new holes for blind joints, using the V0 drill guide.
-  * 8 holes in the back 400mm verticals at ends
-  * 4 repositioned gantry blind access holes in the 300mm.  Use the 15mm corner cubes for these to get the right position with the drill guide.
+* Join extrusions as needed with 20mm set screws.
+* Drill 7.5mm-from-end holes for blind joints as needed, using the [V0 drill guide](https://github.com/VoronDesign/Voron-0/blob/Voron0.2r1/STLs/Tools/V0_Extrusion_Drilling_Guide_x1.STL).
 * Print out a small army’s worth of no-drop nuts ([NDN](https://github.com/zruncho3d/f-zero/tree/main/STLs/NoDropNuts)s).  Size these to your extrusions.  If using a mix of LDO + MBXL, keep them apart, as the sizes will be different.  You don’t want to have to pause the build for these, or hold off on adding them everywhere because you’re running low.
 * Print out extra cable channels and Wago mounts.
 
@@ -68,8 +63,8 @@ XY:
 * Build the complete double-gantry by itself, as a separate module.
     * Add X rails to X extrusions, ensuring alignment
     * Add Y rails to Y extrusions, ensuring alignment
-    * Match-fit tabs in ABs and XYs to extrusions (see BoxZero repo for examples of plastic curl you should see)
-    * Build individual AB blocks and install all bearings/spacers, using CAD as a reference.
+    * Match-fit tabs in AB Drive Modules ("AB"s) and XY Joints ("XY"s) to extrusions (see BoxZero repo for examples of plastic curl you should see)
+    * Build individual ABs and install all bearings/spacers, using CAD as a reference.
     * Build XY joints and install all bearings/spacers.  One m2 head will be tight; leave the allen in on that one, so that it's much easier to tighten when in a module.
     * Add endstop triggers and bases to the appropriate extrusions.
     * Connect two ABs into a side module, twice.
