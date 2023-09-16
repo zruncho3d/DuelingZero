@@ -10,8 +10,7 @@ Also: Klipper code is more easily found [here](https://github.com/zruncho3d/klip
 ### 2022-08-20: Alpha-1  
 This first release covers everything you need to build and run your own Dueling Zero: CAD, STLs, DXFs, sample firmware configs, smart avoidance code, G-code streaming code, instructions, and a parts list... everything but an illustrated manual.  But if you're reading this, you almost certainly don't need a manual, anyway.
 
-To make it easy for anyone to grok this crazy Dual Gantry layout - and learn about its opportunities and challenges, both in hardware and software - this README walks through the software and the design.
+To make it easy for anyone to grok this crazy Dual Gantry layout - and learn about its opportunities and challenges, both in hardware and software - the repo walks through the software and the design.
 
-Enjoy!  There's a lot of content here, and I hope you enjoy it as much as I did bringing this concept to life.  -Z.
-
-Join the [Reddit thread](https://www.reddit.com/r/VORONDesign/comments/wtjxk1/is_idex_dead_dueling_zero_two_extruders_no/) on `r/VoronDesign` for any comments, questions, or kudos.
+**NOTE:**
+See the [Archived_v1](Archived_v1) for this original content.

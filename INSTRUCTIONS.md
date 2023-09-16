@@ -1,27 +1,29 @@
 ## Printing Instructions
 
-**NOTE**: CAD exists to show what’s possible.  NOT to be an exact copy of anything except the gantry.  That’s true-to-life (to Zruncho's build), but the rest is out-of-date stuff.  If you go to the appropriate repos, you’ll have up-to-date stuff.  ZP, T0, B0.  All those are out of date within the CAD!
+CAD exists to show what’s possible.  NOT to be an exact copy of anything except the gantry.  That’s true-to-life (to Zruncho's build), but the rest is out-of-date stuff.  If you go to the appropriate repos, you’ll have up-to-date stuff.  ZP, T0, B0.  All those are out of date within the CAD!
 
 Parts in this repo are intentionally only the delta from other projects, so that as those projects evolve, you get the latest parts, and there's no copy/paste maintenance overhead.  Life is too short for such toil.
 
 Really, only the gantry and the T0 idler base parts are special here.
-* Standard Voron settings should be fine for all custom parts: 40% infill, 4 perims, 5 top/bottom layers, 0.2mm layer height.  Lower infill is likely fine.
+* Standard Voron settings should be fine for all custom D0 parts: 40% infill, 4 perims, 5 top/bottom layers, 0.2mm layer height.  Lower infill is likely fine.
 
-For print settings:
-* Use BoxZero settings for BoxZero corners.
-* Use Tri-Zero settings for Tri-Zero parts.
-* Use ZeroPanels settings for ZeroPanels parts.
-
-As a reminder, BoxZero corners will need a lower layer height (0.16 mm) and/or wider extrusion width (0.55 mm), as they have the highest-angle overhangs.
+For other parts, use the settings specified by the respective repo:
+* [BoxZero](https://github.com/zruncho3d/BoxZero)
+* [TriZero](https://github.com/zruncho3d/tri-zero)
+* [ZeroPanels](https://github.com/zruncho3d/ZeroPanels)
+* [Boop](https://github.com/PrintersForAnts/Boop)
+* [Voron V0.2](https://vorondesign.com/voron0.2)
 
 A distinct color per gantry and per toolhead really does help keep things sane!  It's easy to get turned around when the gantry is upside-down, and when each gantry itself is flipped from the usual V0 orientation.
 
-**NOTE**: quantities (e.g., "_x2") are for the whole printer.  So if you have two distinct-color gantries, do half of the totals for each even-quantity part with each color.  
+**NOTE**: quantities (e.g., "_x2") are for the whole printer.  So if you have two distinct-color gantries, do half of the totals for each even-quantity part with each color.
 
 **NOTE**: Some files are missing here as STLs and CAD currently, which will be needed to match the default size, specifically:
 * longer front and side skirt parts
 * wider side fans
 * baseplate dxf
+
+If you're impatient, a split-move-extrude-join on the part should get you what you need quickly.
 
 **NOTE**: All STLs are oriented with the least-visible seam in the back, and with the correct bed-plate orientation.  For most parts - ABs and XYs - you can hide the seam where an extrusion will block its view.
 

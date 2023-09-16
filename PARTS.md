@@ -7,14 +7,16 @@ In general, none of the parts here should be a surprise.  Beyond anything D0-spe
 | Part | Qty | Qty | Notes |
 | - | - | - | - |
 | X rails | [300mm MGN7H](https://www.aliexpress.com/item/2251832694486732.html?) | 2x | Make sure to also buy a ‘Carriage Only’ part and message the seller to add it to the rail before they ship it. |
-| Y rails | [240mm MGN9H rails](https://www.aliexpress.com/item/2251832586981749.htm) | 2x | Make sure to order high (Z1) preload |
+| Y rails | [250mm MGN9H rails](https://www.aliexpress.com/item/2251832586981749.htm) | 2x | Make sure to order high (Z1) preload |
 | Z rails | 200mm-220mm MGN7H | 4x | |
 
 #### Extrusions
 
+NOTE: the CAD is not the right size.  It's Zruncho's build size.  Which doesn't quite get you a full 180 cube.
+
 The recommended frame size enables a full 180x180x180 build volume, with a bit of extra travel in the rear Y area for a nozzle endstop, nozzle brush, and maybe a camera for alignment.  Yes, you can build a smaller test bed build, but the travel won't be practical.  
 
-You can start from a V0 kit and end-join (BoxZero-style) the chunks, as well as use 1515 supplements cut to length to get a choice of color.  If the size is close for the verticals, you can bridge the gap slightly with BoxZero corners (e.g., 400 + 50 -> 450 with B0 corners).
+You can start from a V0 kit and end-join (BoxZero-style) the chunks ([process described here](https://github.com/zruncho3d/BoxZero#assembly-notes)), as well as use 1515 supplements cut to length to get a choice of color.  If the size is close for the verticals, you can bridge the gap slightly with BoxZero corners (e.g., 400 + 50 -> 450 with B0 corners).
 
 For larger sizes than 180x180 in XY, larger extrusions are recommended.
 
@@ -58,4 +60,4 @@ The control board situation is up to you.  In theory, any boards should be fine,
 
 Gantry boards (GBB15) are highly recommended, as they enable a single cable per side, as well as easier toolhead-cable plug/unplug.
 
-CAN toolhead boards are highly recommended, as they reduce your wiring and enable a smaller main control board.
+Toolhead boards are highly recommended, as they simplify your wiring; CAN and USB enable a much smaller main control board, too.
