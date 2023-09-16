@@ -135,7 +135,7 @@ If all that sounds daunting, this is not the printer for you.  If being the firs
 
 Roughly... start with a Pandora's Box gantry.  Turn it 90 degrees.  Add extra bearing stacks and combine idlers with AB blocks.  Duplicate it about the center.  Flip it upside-down.  Add off-the-shelf Boop and toolheads.
 
-![alt_text](Renders/Gantry/iso_with_final_wires.png)
+![alt_text](Renders/Gantry/over_the_side.png)
 
 That’s the core idea.
 
