@@ -271,7 +271,7 @@ Please raise an issue for this repo to update the list of links if you come acro
   * [HaythamB fork](https://github.com/HaythamB/TAMV)
   * [TAMV on Klipper](https://github.com/TypQxQ/TAMV)
 * [Klipper PR by Tircown that adds duplication and mirror modes](https://github.com/Klipper3d/klipper/pull/4464)
-* [PitStop3](https://mihaidesigns.com/pages/pitstop-3-multi-material-3d-printer): hotend-swapping multi-material printer
+* [PitStop3](https://mihaidesigns.com/pitstop3/): hotend-swapping multi-material printer
 * [Swapper3D](https://www.kickstarter.com/projects/bigbrain3d/swapper3d): nozzle-swapping multi-material printer
 * [Enraged Rabbit Project](https://github.com/EtteGit/EnragedRabbitProject): add multimaterial capability
 * [3D Chamaleon](https://www.3dchameleon.com/): automatic color changer
